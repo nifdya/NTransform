@@ -1,0 +1,107 @@
+[
+  {
+    "task": "ObtenerRango",
+	"module":"tunit",
+	"params": { 
+		"range":{"type":"String","required":true,"description":"Rango a copiar"},
+		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
+		"newColInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Columna"}				
+		}
+  },
+  {
+    "task": "EliminarBlancos",
+	"module":"tunit",
+	"params": { }
+  },
+  {
+    "task": "CambiarPatron",
+	"module":"tunit",
+	"params": { 
+				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
+				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"}	
+			  }
+  },
+  {
+    "task": "ObtenerFilasNMasX",
+	"module":"tunit",
+	"params": { 
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}				
+			  }		
+  },
+  {
+    "task": "BorrarFilasNMasX",
+	"module":"tunit",
+	"params": { 
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}			
+			  }		
+  },
+  {
+    "task": "ObtenerFilaColumnaContiene",
+	"module":"tunit",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"}				
+			  }	
+  },
+  {
+    "task": "BorrarFilaColumnaContiene",
+	"module":"tunit",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"}					
+			  }	
+  },
+  {
+    "task": "ObtieneFilasPosiciones",
+	"module":"tunit",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}		
+			  }	
+  },
+  {
+    "task": "BorrarFilasPosiciones",
+	"module":"tunit",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}		
+			  }	
+  },  
+  {
+    "task": "ObtieneColumnasPosiciones",
+	"module":"tunit",
+	"params": { 
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}	
+			  }	
+  },
+  {
+    "task": "BorrarColumnasPosiciones",
+	"module":"tunit",
+	"params": { 
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}			
+			  }	
+  },
+  {
+    "task": "DividirColumnaPatron",
+  	"module":"tunit",
+  	"params": { 
+  			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
+  			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}
+			  					
+  		  }
+  },  
+  {
+    "task": "UnirColumnasPatron",
+  	"module":"tunit",
+  	"params": { 
+  			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
+  			"positionNewColumn":{"type":"Integer","index":true,"required":false,"description":"Posición en la que ubicaremos la nueva columna. Si no se indica se posicionará al final, si se indica las columnas siguientes se deplazarán una columna. "},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}					
+  		  }
+  }  
+]
