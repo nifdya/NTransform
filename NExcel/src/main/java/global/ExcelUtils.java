@@ -79,6 +79,104 @@ public class ExcelUtils {
 		}
 	}
 
+	private static boolean matchesMode(String cellValue, String searchValue, int modo) {
+	    if (cellValue == null || searchValue == null) return false;
+	    
+	    String cellLower = cellValue.toLowerCase();
+	    String searchLower = searchValue.toLowerCase();
+	    
+	    switch (modo) {
+	        case 0: // Palabra completa
+	            return cellLower.equals(searchLower);
+	        case 1: // Contiene el texto en cualquier posición
+	            return cellLower.contains(searchLower);
+	        case 2: // La columna empieza por
+	            return cellLower.startsWith(searchLower);
+	        case 3: // La columna finaliza por
+	            return cellLower.endsWith(searchLower);
+	        default:
+	            throw new IllegalArgumentException("Modo de búsqueda no válido: " + modo);
+	    }
+	}
+
+	/**
+	 * Comprueba si una celda específica en una fila coincide con un valor de texto
+	 * según el modo seleccionado.
+	 * 
+	 * @param rowInput       Fila a evaluar.
+	 * @param columnPosition Índice de la columna.
+	 * @param valueStr       Valor a buscar.
+	 * @param modo           Modo de búsqueda (0: Completo, 1: Contiene, 2: Empieza, 3: Termina).
+	 * @return true si el valor coincide.
+	 */
+	public static boolean columnContains(Row rowInput, Integer columnPosition, String valueStr, int modo) {
+		Cell cell = rowInput.getCell(columnPosition);
+		DataFormatter dataFormatter = new DataFormatter();
+		String cellValue = dataFormatter.formatCellValue(cell);
+
+		return matchesMode(cellValue, valueStr, modo);
+	}
+	/**
+	 * Comprueba si una celda específica coincide con cualquiera de los valores
+	 * proporcionados en un array según el modo seleccionado.
+	 * 
+	 * @param rowInput       Fila a evaluar.
+	 * @param columnPosition Índice de la columna.
+	 * @param valuesStr      Array de posibles valores coincidentes.
+	 * @param modo           Modo de búsqueda (0: Completo, 1: Contiene, 2: Empieza, 3: Termina).
+	 * @return true si coincide con alguno de los valores.
+	 */
+	public static boolean columnContains(Row rowInput, Integer columnPosition, String[] valuesStr, int modo) {
+		Cell cell = rowInput.getCell(columnPosition);
+		DataFormatter dataFormatter = new DataFormatter();
+		String cellValue = dataFormatter.formatCellValue(cell);
+
+		return Arrays.stream(valuesStr).anyMatch(val -> matchesMode(cellValue, val, modo));
+	}
+
+	/**
+	 * Busca varios posibles valores en múltiples posiciones de columna según el modo seleccionado.
+	 * 
+	 * @param rowInput        Fila a evaluar.
+	 * @param columnPositions Array con los índices de las columnas a revisar.
+	 * @param valueStr        Array con los valores a buscar.
+	 * @param modo            Modo de búsqueda (0: Completo, 1: Contiene, 2: Empieza, 3: Termina).
+	 * @return true si se encuentra alguna coincidencia en cualquiera de las
+	 *         columnas especificadas.
+	 */
+	public static boolean columnContains(Row rowInput, Integer[] columnPositions, String[] valueStr, int modo) {
+		boolean exist = false;
+		DataFormatter dataFormatter = new DataFormatter();
+		
+		for (int i = 0; i < columnPositions.length; i++) {
+			Cell cell = rowInput.getCell(columnPositions[i]);
+			String cellValue = dataFormatter.formatCellValue(cell);
+			
+			exist = Arrays.stream(valueStr).anyMatch(val -> matchesMode(cellValue, val, modo));
+			if (exist) {
+				break; // Detener el bucle si ya encontramos una coincidencia
+			}
+		}
+		return exist;
+	}
+
+	/**
+	 * Busca un valor de texto en columnas específicas de una fila según el modo seleccionado.
+	 * 
+	 * @param rowInput  Fila a evaluar.
+	 * @param valueStr  Valor a buscar.
+	 * @param positions Array con los índices de las columnas a revisar.
+	 * @param modo      Modo de búsqueda (0: Completo, 1: Contiene, 2: Empieza, 3: Termina).
+	 */
+	public static boolean rowContains(Row rowInput, String valueStr, Integer[] positions, int modo) {
+		for (int i = 0; i < positions.length; i++) {
+			if (ExcelUtils.columnContains(rowInput, positions[i], valueStr, modo)) {
+				return true; // Retorna true inmediatamente al encontrar coincidencia
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Comprueba si una celda específica en una fila contiene un valor de texto
 	 * exacto (case-insensitive).
@@ -101,7 +199,42 @@ public class ExcelUtils {
 			return false;
 		}
 	}
-
+	/**
+	 * Verifica si una fila contiene una lista de valores en posiciones específicas
+	 * o en toda la fila según el modo seleccionado.
+	 * 
+	 * @param rowInput  Fila a evaluar.
+	 * @param valueStrs Valores a buscar.
+	 * @param positions Posiciones específicas (si es null o vacío, busca en toda la fila).
+	 * @param modo      Modo de búsqueda (0: Completo, 1: Contiene, 2: Empieza, 3: Termina).
+	 * @return true si encuentra coincidencias.
+	 */
+	public static boolean rowContainsListValues(Row rowInput, String[] valueStrs, Integer[] positions, int modo) {
+		// Caso A: Buscar en posiciones específicas
+		if (positions != null && positions.length > 0) {
+			for (int i = 0; i < positions.length; i++) {
+				if (ExcelUtils.columnContains(rowInput, positions[i], valueStrs, modo)) {
+					return true;
+				}
+			}
+		} 
+		// Caso B: Buscar en toda la fila (positions es null o vacío)
+		else {
+			// Creamos un array con los índices de todas las celdas que contienen datos en la fila
+			Integer[] allPositions = new Integer[(int) rowInput.getLastCellNum()];
+			for (int i = 0; i < allPositions.length; i++) {
+				allPositions[i] = i;
+			}
+			
+			// Buscamos cada valor de la lista en todas las posiciones de la fila
+			for (int i = 0; i < valueStrs.length; i++) {
+				if (ExcelUtils.rowContains(rowInput, valueStrs[i], allPositions, modo)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}	
 	/**
 	 * Comprueba si una celda específica contiene cualquiera de los valores
 	 * proporcionados en un array.
@@ -111,6 +244,7 @@ public class ExcelUtils {
 	 * @param valuesStr      Array de posibles valores coincidentes.
 	 * @return true si coincide con alguno de los valores.
 	 */
+	@Deprecated
 	public static boolean columnContains(Row rowInput, Integer columnPosition, String[] valuesStr) {
 
 		Cell cell = rowInput.getCell(columnPosition);
@@ -131,6 +265,7 @@ public class ExcelUtils {
 	 * @return true si se encuentra alguna coincidencia en cualquiera de las
 	 *         columnas especificadas.
 	 */
+	@Deprecated
 	public static boolean columnContains(Row rowInput, Integer[] columnPositions, String[] valueStr) {
 
 		boolean exist = false;
@@ -149,6 +284,7 @@ public class ExcelUtils {
 	/**
 	 * Busca un valor de texto en columnas específicas de una fila.
 	 */
+	@Deprecated
 	public static boolean rowContains(Row rowInput, String valueStr, Integer[] positions) {
 		boolean exist = false;
 		for (int i = 0; i < positions.length && exist == false; i++) {
@@ -167,6 +303,7 @@ public class ExcelUtils {
 	 *                  fila).
 	 * @return true si encuentra coincidencias.
 	 */
+	@Deprecated
 	public static boolean rowContainsListValues(Row rowInput, String[] valueStrs, Integer[] positions) {
 		boolean exist = false;
 		if (positions != null && positions.length > 0) {
@@ -188,6 +325,7 @@ public class ExcelUtils {
 	 * @param valueStr Valor buscado.
 	 * @return true si aparece en alguna columna.
 	 */
+	@Deprecated
 	public static boolean rowContains(Row rowInput, String valueStr) {
 		boolean exist = false;
 		for (int i = 0; i < rowInput.getLastCellNum() && exist == false; i++) {
@@ -203,6 +341,7 @@ public class ExcelUtils {
 	 * @param cInput  Celda origen.
 	 * @param cOutput Celda destino.
 	 */
+	
 	public static void copyCellValue(Cell cInput, Cell cOutput) {
 		switch (cInput.getCellType()) {
 		case STRING:

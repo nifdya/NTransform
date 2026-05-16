@@ -1,5 +1,7 @@
 package global.task;
 
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,11 +26,19 @@ public class FileConfigTaskConfiguration {
 	public FileConfigTaskConfiguration() throws IOException 
 	{
 		this.mapper = new ObjectMapper();
-		try (InputStream is = getClass().getResourceAsStream("/config.json")) {
-			if (is == null)
-				throw new RuntimeException("No se halló el JSON interno");
+		try (InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("config_excel.json")) {
+		    if (is == null) {
+		        throw new FileNotFoundException("El archivo config.json no se encontró dentro del JAR");
+		    }
+
 			rootNode = mapper.readTree(is);
 		}
+		//try (InputStream is = FileConfigTaskConfiguration.class.getClassLoader().getResourceAsStream("config.json")){
+		//try (InputStream is = FileConfigTaskConfiguration.class.getClassLoader().getResourceAsStream("config.json")){
+		//File archivoExterno = new File("C:\\Users\\ines\\config.json");
+
+	//	try (InputStream is = new FileInputStream(archivoExterno)) {	
+
 	}
 	
 	public ObjectMapper getMapper() {

@@ -80,8 +80,7 @@ public class Excel implements Callable<Integer> {
 	 * @return El archivo de entrada .
 	 */
 	private File getEffectiveInputFile() {
-
-		return new File(this.inputFile.getName());
+	    return this.inputFile.getAbsoluteFile();
 	}
 
 	/**
@@ -90,9 +89,7 @@ public class Excel implements Callable<Integer> {
 	 * @return El archivo de salida.
 	 */
 	private File getEffectiveOutputFile() {
-
-		// Retornamos el nuevo archivo en la misma carpeta que el original
-		return new File(outputFile.getParent(), this.outputFile.getName());
+	    return this.outputFile.getAbsoluteFile();
 	}
 
 	/**
@@ -101,19 +98,15 @@ public class Excel implements Callable<Integer> {
 	 * @param file Archivo a cargar.
 	 * @return Instancia de {@link XSSFWorkbook} o null si ocurre un error.
 	 */
-	@SuppressWarnings("finally")
-	protected XSSFWorkbook loadIputWorkbook(File file) {
-		XSSFWorkbook fIn = null;
-		try {
-			fIn = new XSSFWorkbook(file);
 
-		} catch (Exception e) {
-			System.err.println("Se produjo un error al cargar el fichero de origen");
-			fIn = null;
-		} finally {
-			return fIn;
-		}
-	}
+	protected XSSFWorkbook loadIputWorkbook(File file) {
+	    try (FileInputStream fis = new FileInputStream(file)) {
+	        return new XSSFWorkbook(fis);
+	    } catch (Exception e) {
+	        System.err.println("Se produjo un error al cargar el fichero de origen: " + e.getMessage());
+	        return null;
+	    }
+	} 
 
 	/**
 	 * Lógica principal de ejecución de la tarea. Gestiona el flujo de lectura,

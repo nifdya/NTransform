@@ -128,7 +128,7 @@ public class UnitaryTransformations extends MasterOperation {
 	 */
 	private boolean processRowTask(Row rowInput, Sheet outSheet, int currentRow, int originalPositionRow) {
 		boolean addRow = false;
-
+		Integer modeFilterContains=0;
 		switch (uTask) {
 		case EliminarBlancos:
 			if (!ExcelUtils.isRowEmpty(rowInput)) {
@@ -158,15 +158,17 @@ public class UnitaryTransformations extends MasterOperation {
 			}
 			break;
 		case ObtenerFilaColumnaContiene:
+			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = ExcelUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions"));
+					this.optsTask.get("rowPositions"),modeFilterContains);
 			if (addRow) {
 				this.newRow(rowInput, outSheet, currentRow);
 			}
 			break;
 		case BorrarFilaColumnaContiene:
+			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = !(ExcelUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions")));
+					this.optsTask.get("rowPositions"),modeFilterContains));
 			if (addRow) {
 				this.newRow(rowInput, outSheet, currentRow);
 			}
@@ -355,6 +357,7 @@ public class UnitaryTransformations extends MasterOperation {
 		case ObtieneColumnasPosiciones:
 		case BorrarColumnasPosiciones:
 		case DividirColumnaPatron:
+		case BorrarFilasPosiciones:
 			this.getOutputFileCheckByRow(fIn);
 			break;
 		default:

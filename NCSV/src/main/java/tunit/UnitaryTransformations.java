@@ -2,7 +2,7 @@ package tunit;
 
 import java.io.IOException;
 import java.util.Arrays;
-
+import java.util.Iterator;
 
 import org.apache.commons.csv.CSVRecord;
 
@@ -114,18 +114,21 @@ public class UnitaryTransformations {
 
 
 
-	@SuppressWarnings("finally")
+	/**
+	 * Se realiza el procesamiento por fila para generar el fichero de salida
+	 * @return
+	 */
 	public Boolean getOutputFileCheckByRow() {
 		try {
 			int contOriginal=0;
-            for (CSVRecord record : this.opts.getInputFile()) {                
+			for (CSVRecord record : this.opts.getInputFile()) {                
             	this.processRowTask(record,contOriginal);
             	contOriginal++;
             }
 			return true;
 
 		} catch (Exception e) {
-			return null;
+			return false;
 
 		}
 	}

@@ -71,7 +71,8 @@
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
 				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
-				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}				
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}		
 			  }	
   },
   {
@@ -82,7 +83,9 @@
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
 				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
-				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}					
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}		
+									
 			  }	
   },
   {
