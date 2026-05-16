@@ -47,8 +47,12 @@ public class CSV implements Callable<Integer> {
 
 
 	/** Indicar si hay cabeceras en la primera línea del fichero */
-	@Option(names = { "-h", "--headers" }, description = "Si hay cabeceras en la primera línea")
-	private Boolean firstLineHeaders = true;
+	@Option(names = { "-f", "--headers" }, description = "Si hay cabeceras en la primera línea")
+	private boolean firstLineHeaders = false; // Por defecto es false. Escribir -f lo vuelve true.
+	
+	/** Indica si se mantiene el fichero de cabeceras en el producto final */
+	@Option(names = { "-k", "--keeph" }, description = "Si se mantendrá la cabecera en el fichero destino")
+	private boolean keepHeaders = false; // Por defecto es false. Escribir -k lo vuelve true.
 
 	/** Lista de tareas y sus configuraciones específicas pasadas por comando. */
 	// Acepta parámetros estilo: -T limpiar:columna=A -T formatear:columna=B
@@ -80,7 +84,7 @@ public class CSV implements Callable<Integer> {
 
 		// Definimos el formato: Excel usa punto y coma (;), CSV estándar usa coma (,)
 		CSVFormat formato = null;
-		if (this.firstLineHeaders) {
+		if (this.firstLineHeaders ) {
 
 			formato = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(this.delimiter).setHeader() 
 					.setSkipHeaderRecord(true).setTrim(true).build();
@@ -119,7 +123,7 @@ public class CSV implements Callable<Integer> {
 	@SuppressWarnings("deprecation")
 	private CSVFormat getFormatForPrinter(CSVParser parser) {
 	    CSVFormat format = CSVFormat.Builder.create(CSVFormat.DEFAULT).setDelimiter(this.delimiter).build();
-	    if (this.firstLineHeaders && parser.getHeaderMap() != null) {
+	    if (this.firstLineHeaders && this.keepHeaders &&   parser.getHeaderMap() != null) {
 	        return format.withHeader(parser.getHeaderMap().keySet().toArray(new String[0]));
 	    }
 	    return format;
@@ -134,8 +138,8 @@ public class CSV implements Callable<Integer> {
 			File currentInput = new File(this.inputFile);
 
 			// Bucle de tareas
-			for (int i = 0; i < listTaskInCommand.size(); i++) {
-				String iTask = listTaskInCommand.get(i);
+			for (int i = 0; i < this.listTaskInCommand.size(); i++) {
+				String iTask = this.listTaskInCommand.get(i);
 				String[] inputDataTask = iTask.split("\\|");
 				Task currentTask = Task.valueOf(inputDataTask[0]);
 
@@ -144,11 +148,12 @@ public class CSV implements Callable<Integer> {
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, taskParams);
 				TaskOptions optTask = optTaskConfig.getTaskOptions();
 
+
 				// Determinar salida de este paso:
 				// Si es la última tarea, escribimos en el outputFile original.
 				// Si no, escribimos en un archivo temporal.
 				File nextOutput;
-				if (i == listTaskInCommand.size() - 1) {
+				if (i == this.listTaskInCommand.size() - 1) {
 					nextOutput = new File(this.outputFile);
 				} else {
 					nextOutput = File.createTempFile("csv_step_" + i + "_", ".tmp");
@@ -170,6 +175,9 @@ public class CSV implements Callable<Integer> {
 						break;
 					default:
 						break;
+					}
+					if (!this.keepHeaders) {
+					    this.firstLineHeaders = false;
 					}
 				}
 

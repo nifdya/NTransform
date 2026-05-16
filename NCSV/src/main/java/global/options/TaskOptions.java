@@ -14,7 +14,7 @@ public class TaskOptions {
     private String task;
     /** Módulo en el que se procesará la tarea */
     private String module; 
-    /** Parámetros específicos de la tarea */
+	/** Parámetros específicos de la tarea */
     private Map<String, Object> params;
 
     /**
@@ -39,7 +39,6 @@ public class TaskOptions {
      * @return
      */
     public String getModule() { return module; } 
-    
     /**
      * Obtiene el parámetro indexado por valor de  la lista de parámestros
      * @param <T>
