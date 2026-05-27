@@ -1,0 +1,53 @@
+{
+  "ficheroInicial": "origen.xls",
+  "ficheroFinal": "destino.xlsx",
+  "ficherosIntermedios": "intermedio_[[PASO]].xlsx",
+  "instrucciones": [
+    {
+      "jar": "NExcel.jar",
+      "paso": "1",
+        "tareas": [
+			{
+			  "tarea": "nomtarea1|p1=v1|p2=v2"
+			},
+			{
+			  "tarea": "nomtarea2|p1=v1",
+			},
+			{
+			  "tarea": "nomtarea3"
+			}
+		  ]
+	},       
+	{
+      "jar": "NExcel.jar",
+      "paso": "2",
+        "tareas": [
+			{
+			  "tarea": "nomtarea1|p1=v1|p2=v2"
+			},
+			{
+			  "tarea": "nomtarea2|p1=v1",
+			},
+			{
+			  "tarea": "nomtarea3"
+			}
+		  ]
+	},    
+	{
+      "jar": "NExcel.jar",
+      "paso": "3",
+        "tareas": [
+			{
+			  "tarea": "nomtarea1|p1=v1|p2=v2"
+			},
+			{
+			  "tarea": "nomtarea2|p1=v1",
+			},
+			{
+			  "tarea": "nomtarea3"
+			}
+		  ]
+	},
+
+  ]
+}

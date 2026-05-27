@@ -36,6 +36,7 @@ public class UnitaryTransformations {
 	 */
 	private boolean processRowTask(CSVRecord rowInput,  int originalPositionRow) {
 		boolean addRow = false;
+		Integer modeFilterContains=0;
 		try {
 		switch (uTask) {
 		case EliminarBlancos:
@@ -65,15 +66,17 @@ public class UnitaryTransformations {
 			}
 			break;
 		case ObtenerFilaColumnaContiene:
+			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = CSVUtils.rowContains(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions"));
+					this.optsTask.get("rowPositions"),modeFilterContains);
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
 			}
 			break;
 		case BorrarFilaColumnaContiene:
+			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = !(CSVUtils.rowContains(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions")));
+					this.optsTask.get("rowPositions"),modeFilterContains));
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
 			}

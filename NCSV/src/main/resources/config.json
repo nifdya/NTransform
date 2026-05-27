@@ -42,7 +42,8 @@
 	"module":"tunit",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
-				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"}				
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}									
 			  }	
   },
   {
@@ -50,7 +51,8 @@
 	"module":"tunit",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
-				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"}					
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}											
 			  }	
   },
   {

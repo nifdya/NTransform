@@ -1,0 +1,107 @@
+package convert;
+
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+public class CsvExcelConverter {
+
+    // Configuración centralizada del CSV compatible con Excel estándar
+    private static final CSVFormat EXCEL_CSV_FORMAT = CSVFormat.EXCEL.builder()
+            .setDelimiter(';') // Cambiar por ',' si tu entorno usa coma
+            .setIgnoreEmptyLines(true)
+            .setTrim(true)
+            .build();
+
+    /**
+     * PROCESO 1: CSV -> XLSX
+     * Lee un CSV de forma segura (soportando saltos de línea o comillas internas)
+     */
+    public static void csvToXlsx(String csvPath, String xlsxPath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, StandardCharsets.UTF_8));
+             CSVParser csvParser = new CSVParser(reader, EXCEL_CSV_FORMAT);
+             Workbook workbook = new XSSFWorkbook()) {
+
+            Sheet sheet = workbook.createSheet("Datos");
+            int rowNum = 0;
+
+            for (CSVRecord record : csvParser) {
+                Row row = sheet.createRow(rowNum++);
+                for (int i = 0; i < record.size(); i++) {
+                    Cell cell = row.createCell(i);
+                    String value = record.get(i);
+                    
+                    processCellValue(cell, value);
+                }
+            }
+
+            try (FileOutputStream fileOut = new FileOutputStream(xlsxPath)) {
+                workbook.write(fileOut);
+            }
+        }
+    }
+
+    /**
+     * PROCESO INVERSO: XLSX -> CSV
+     * Lee un Excel y genera un CSV escapando caracteres de forma automática
+     */
+    public static void xlsxToCsv(String xlsxPath, String csvPath) throws IOException {
+        // DataFormatter es clave: lee las celdas tal y como se ven en Excel
+        DataFormatter dataFormatter = new DataFormatter();
+
+        try (InputStream fileIn = new FileInputStream(xlsxPath);
+             Workbook workbook = WorkbookFactory.create(fileIn);
+             BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, StandardCharsets.UTF_8));
+             CSVPrinter csvPrinter = new CSVPrinter(writer, EXCEL_CSV_FORMAT)) {
+
+            // Procesamos la primera hoja
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (Row row : sheet) {
+                // Evaluamos dinámicamente el total real de columnas de la fila
+                int lastColumn = Math.max(row.getLastCellNum(), 0);
+                String[] lineData = new String[lastColumn];
+
+                for (int cn = 0; cn < lastColumn; cn++) {
+                    Cell cell = row.getCell(cn, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                    if (cell == null) {
+                        lineData[cn] = "";
+                    } else {
+                        // Formatea números, fechas y textos según la configuración de la celda
+                        lineData[cn] = dataFormatter.formatCellValue(cell);
+                    }
+                }
+                // Escribe la línea escapando comillas o delimitadores automáticamente si es necesario
+                csvPrinter.printRecord((Object[]) lineData);
+            }
+            csvPrinter.flush();
+        }
+    }
+
+    /**
+     * Asigna tipos de datos dinámicos evitando corromper textos que parecen números
+     */
+    private static void processCellValue(Cell cell, String value) {
+        if (value == null || value.isEmpty()) {
+            cell.setBlank();
+            return;
+        }
+        // Conserva códigos de identificación con ceros iniciales (Ej: "08001") como texto
+        if (value.length() > 1 && value.startsWith("0") && value.matches("\\d+")) {
+            cell.setCellValue(value);
+            return;
+        }
+        try {
+            cell.setCellValue(Double.parseDouble(value));
+        } catch (NumberFormatException e) {
+            cell.setCellValue(value);
+        }
+    }
+}
