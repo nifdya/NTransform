@@ -1,0 +1,174 @@
+[
+  {
+    "task": "CombinarHojas",
+	"module":"merge",
+	"description":"Obtiener un rango determinado del fichero",
+    "params": { 
+		"header":{"type":"Boolean","required":false,"description":"Imprime los nombres de las hojas como cabecera en el siguiente grupo"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}		
+	}
+  },
+  {
+    "task": "ObtenerRango",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+		"range":{"type":"String","required":true,"description":"Rango a copiar"},
+		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
+		"newColInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Columna"},
+		"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+		"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+		"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}					
+		}
+  },
+  {
+    "task": "EliminarBlancos",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 	
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}	
+			}
+  },
+  {
+    "task": "CambiarPatron",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
+				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}		
+			  }
+  },
+  {
+    "task": "ObtenerFilasNMasX",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}					
+			  }		
+  },
+  {
+    "task": "BorrarFilasNMasX",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}				
+			  }		
+  },
+  {
+    "task": "ObtenerFilaColumnaContiene",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}		
+			  }	
+  },
+  {
+    "task": "BorrarFilaColumnaContiene",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}		
+									
+			  }	
+  },
+  {
+    "task": "ObtieneFilasPosiciones",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}			
+			  }	
+  },
+  {
+    "task": "BorrarFilasPosiciones",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}				
+			  }	
+  },  
+  {
+    "task": "ObtieneColumnasPosiciones",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}			
+			  }	
+  },
+  {
+    "task": "BorrarColumnasPosiciones",
+	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+	"params": { 
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"},
+				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+				"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."}				
+			  }	
+  },
+  {
+    "task": "DividirColumnaPatron",
+  	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+  	"params": { 
+  			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
+  			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
+  			"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+  			"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
+  			"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}
+			  					
+  		  }
+  },  
+  {
+    "task": "UnirColumnasPatron",
+  	"module":"tunit",
+	"description":"Obtiener un rango determinado del fichero",
+  	"params": { 
+  			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
+  			"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
+  			"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de las columnas a combinar en una."},
+  			"positionNewColumn":{"type":"Integer","index":true,"required":false,"description":"Posición en la que ubicaremos la nueva columna. Si no se indica se posicionará al final, si se indica las columnas siguientes se deplazarán una columna. "},
+  			"sheetsName":{"type":"ListString","required":false,"description":"Listado de hojas para las que se realizará la acción."},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}					
+  		  }
+  }  
+]
