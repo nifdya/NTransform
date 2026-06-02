@@ -70,6 +70,85 @@ public class DynamicFormPanel extends JPanel {
         }
     }
 
+    public boolean validateForm() {
+        boolean isValid = true;
+
+        for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
+            String paramName = entry.getKey();
+            ParamConfig prop = entry.getValue();
+            JComponent comp = fieldsMap.get(paramName);
+            
+            if (comp == null) continue;
+
+            // Restaurar estado visual por defecto antes de validar de nuevo
+            String defaultDesc = prop.getDescription() != null ? prop.getDescription() : "";
+            comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
+            comp.setToolTipText(defaultDesc);
+
+            // 1. Extraer el valor actual del componente en formato String
+            String value = "";
+            if (comp instanceof JTextField) {
+                value = ((JTextField) comp).getText().trim();
+            } else if (comp instanceof JComboBox) {
+                Object selected = ((JComboBox<?>) comp).getSelectedItem();
+                value = (selected != null) ? selected.toString().trim() : "";
+            } else if (comp instanceof JSpinner) {
+                value = ((JSpinner) comp).getValue().toString();
+            } else if (comp instanceof JCheckBox) {
+                value = ((JCheckBox) comp).isSelected() ? "true" : "false";
+            }
+
+            // 2. Validación de Campos Obligatorios
+            if (prop.isRequired() && value.isEmpty()) {
+                comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                comp.setToolTipText("Este campo es obligatorio.");
+                isValid = false;
+                continue; // Pasa al siguiente campo
+            }
+
+            // 3. Validación de Tipos de Datos (solo si tiene contenido)
+            if (!value.isEmpty()) {
+                boolean typeError = false;
+                String errorMsg = "";
+
+                switch (prop.getType()) {
+                    case "Integer":
+                        try {
+                            Integer.parseInt(value);
+                        } catch (NumberFormatException e) {
+                            typeError = true;
+                            errorMsg = "Debe ser un número entero válido.";
+                        }
+                        break;
+
+                    case "ListInteger":
+                        if (!value.matches("^-?\\d+(;-?\\d+)*$")) {
+                            typeError = true;
+                            errorMsg = "Formato incorrecto. Use números separados por punto y coma (ej: 1;2;3).";
+                        }
+                        break;
+
+                    case "ListString":
+                        if (!value.matches("^[^;]+(;[^;]+)*$")) {
+                            typeError = true;
+                            errorMsg = "Formato incorrecto. Use textos separados por punto y coma (ej: texto1;texto2).";
+                        }
+                        break;
+                }
+
+                if (typeError) {
+                    comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                    comp.setToolTipText(errorMsg);
+                    isValid = false;
+                }
+            }
+        }
+
+        // Refresca visualmente el panel para aplicar los cambios de borde de inmediato
+        repaint(); 
+        return isValid;
+    }
+   
     /**
      * Devuelve los parámetros formateados en formato clave=valor unidos por tuberías.
      */

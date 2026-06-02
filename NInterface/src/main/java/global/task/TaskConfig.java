@@ -19,4 +19,8 @@ public class TaskConfig {
 
     public Map<String, ParamConfig> getParams() { return params; }
     public void setParams(Map<String, ParamConfig> params) { this.params = params; }
+    @Override
+    public String toString() {
+        return this.getTask(); // Esto hace que el JList siga mostrando el texto visible correctamente
+    }
 }

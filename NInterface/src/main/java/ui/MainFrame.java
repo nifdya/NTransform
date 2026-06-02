@@ -3,6 +3,7 @@ package ui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
@@ -18,11 +19,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import global.task.TaskConfig;
 
-
 public class MainFrame extends JFrame {
     private JComboBox<String> configSelector;
-    private JList<String> taskList;
-    private DefaultListModel<String> listModel;
+    private JList<TaskConfig> taskList;
+    private DefaultListModel<TaskConfig> listModel;
     private JPanel cardsPanel;
     private CardLayout cardLayout;
     private Map<String, DynamicFormPanel> formsMap = new HashMap<>();
@@ -36,6 +36,7 @@ public class MainFrame extends JFrame {
     private final List<String> instruccionesAgregadas = new ArrayList<>();
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private JLabel lblDescription; 
     
     // Listado de tus 6 archivos de configuración JSON
     private final String[] jsonFiles = {
@@ -98,23 +99,43 @@ public class MainFrame extends JFrame {
         // 2. PANEL CENTRAL: Lista de Tareas e Interfaz de Parámetros
         // =============================================================
         listModel = new DefaultListModel<>();
-        taskList = new JList<>(listModel);
+        taskList = new JListCustom(listModel);
         taskList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         cardLayout = new CardLayout();
         cardsPanel = new JPanel(cardLayout);
 
+        // NUEVO: Inicializar la etiqueta de descripción con estilo limpio
+        lblDescription = new JLabel("Seleccione una tarea para ver sus parámetros");
+        lblDescription.setFont(new Font("SansSerif", Font.ITALIC, 13));
+        lblDescription.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 5));
+        lblDescription.setForeground(Color.DARK_GRAY);
+
+        // NUEVO: Panel derecho que junta la descripción (arriba) y los formularios (centro)
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(lblDescription, BorderLayout.NORTH);
+        rightPanel.add(cardsPanel, BorderLayout.CENTER);
+
+        // MODIFICADO: Ahora el JSplitPane incluye 'rightPanel' en vez de 'cardsPanel' directamente
+        JSplitPane splitFormularios = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(taskList), rightPanel);
+        splitFormularios.setDividerLocation(220);
+ 
+        
         taskList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                String selected = taskList.getSelectedValue();
+            	
+                TaskConfig selected = taskList.getSelectedValue();
                 if (selected != null) {
-                    cardLayout.show(cardsPanel, selected);
+                    lblDescription.setText("<html><b>Descripción:</b> " + selected.getDescription() + "</html>");
+                    	
+                    // CORRECCIÓN: CardLayout requiere un String identificador, no el objeto completo
+                    cardLayout.show(cardsPanel, selected.getTask()); 
+
+                    
                 }
             }
         });
 
-        JSplitPane splitFormularios = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(taskList), cardsPanel);
-        splitFormularios.setDividerLocation(220);
 
         // Botón para registrar la instrucción actual en la cola
         JButton btnAddInstruction = new JButton("➕ Añadir Instrucción al Listado");
@@ -190,9 +211,11 @@ public class MainFrame extends JFrame {
             if (tasksList != null) {
                 for (TaskConfig task : tasksList) {
                     String name = task.getTask();
-                    listModel.addElement(name);
                     
-                    // Al crear el panel, se inyectan automáticamente los tooltips del Punto 2
+                    // CORRECCIÓN: Agrega el objeto TaskConfig en lugar de la variable String 'name'
+                    listModel.addElement(task); 
+                    
+                    // Inyección automática de parámetros
                     DynamicFormPanel form = new DynamicFormPanel(task.getParams());
                     formsMap.put(name, form);
                     cardsPanel.add(form, name);
@@ -202,40 +225,42 @@ public class MainFrame extends JFrame {
                 taskList.setSelectedIndex(0);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar configuración:\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al cargar la configuración: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    /**
-     * PUNTO 3: Agrega la tarea activa al listado persistente de la tabla.
-     */
-    private void addInstructionToPipeline() {
-        String selectedTask = taskList.getSelectedValue();
+    // Métodos mock para evitar errores de compilación locales
+    private void addInstructionToPipeline() { 
+    	
+    	
+        TaskConfig selectedTask = taskList.getSelectedValue();
         if (selectedTask == null) {
             JOptionPane.showMessageDialog(this, "Por favor, selecciona una tarea para añadir.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        DynamicFormPanel activeForm = formsMap.get(selectedTask);
-        String serializedParams = activeForm.getSerializedParams();
+        DynamicFormPanel activeForm = formsMap.get(selectedTask.getTask());
+        if(activeForm.validateForm())
+        {
+            String serializedParams = activeForm.getSerializedParams();
 
-        String tareaCompleta = selectedTask;
-        if (!serializedParams.isEmpty()) {
-            tareaCompleta += "|" + serializedParams;
+            String tareaCompleta = selectedTask.getTask();
+            if (!serializedParams.isEmpty()) {
+                tareaCompleta += "|" + serializedParams;
+            }
+
+            // Se guarda en la lista interna sin verse afectada si el usuario cambia de JSON
+            instruccionesAgregadas.add(tareaCompleta);
+            int siguientePaso = instruccionesAgregadas.size();
+            String jsonOrigen = (String) configSelector.getSelectedItem();
+            
+            tableModel.addRow(new Object[]{siguientePaso, jsonOrigen, tareaCompleta});	
         }
 
-        // Se guarda en la lista interna sin verse afectada si el usuario cambia de JSON
-        instruccionesAgregadas.add(tareaCompleta);
-        int siguientePaso = instruccionesAgregadas.size();
-        String jsonOrigen = (String) configSelector.getSelectedItem();
-        
-        tableModel.addRow(new Object[]{siguientePaso, jsonOrigen, tareaCompleta});
     }
-    /**
-     * PUNTO 1: Exporta de manera estructurada el JSON de salida con un JFileChooser nativo.
-     * Mantiene los datos agregados en el listado aunque se haya cambiado de JSON de configuración.
-     */
-    private void savePipelineToFile() {
+    
+    private void savePipelineToFile() { 
         // Validación: Evitar generar un archivo vacío si no hay instrucciones añadidas
         if (instruccionesAgregadas.isEmpty()) {
             JOptionPane.showMessageDialog(this, 
@@ -244,7 +269,6 @@ public class MainFrame extends JFrame {
                 JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         // Crear el selector de archivos nativo de Swing
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Guardar Configuración de Pipeline Final");
@@ -308,5 +332,4 @@ public class MainFrame extends JFrame {
             }
         }
     }
-    
-}            
+}
