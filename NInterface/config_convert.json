@@ -1,0 +1,17 @@
+[
+  {
+    "task": "XLS2XLSX",
+	"description":"Convierte el fichero de XLS a XLSX",
+	"params": { }
+  },
+  {
+    "task": "CSV2XLSX",
+	"description":"Convierte el fichero de CSV a XLSX",
+	"params": { }
+  },
+  {
+    "task": "XLSX2CSV",
+	"description":"Convierte el fichero de XLSX a CSV",
+	"params": { }
+  }
+]

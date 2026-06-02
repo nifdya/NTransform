@@ -41,7 +41,8 @@ public class MainFrame extends JFrame {
     // Listado de tus 6 archivos de configuración JSON
     private final String[] jsonFiles = {
         "config_csv.json", 
-        "config_excel.json"
+        "config_excel.json",
+        "config_convert.json"
     };
 
     public MainFrame() {
