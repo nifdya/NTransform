@@ -13,9 +13,7 @@ public class ComunOptions {
 	private BufferedReader inputFile;
 	private BufferedWriter outputFile;
 	
-	// Añadimos la metadata de posiciones fijas extraída del XML
-	private List<Integer> campoLongitudes;
-	private List<Boolean> campoIgnorados;
+
 
 	public BufferedReader getInputFile() {
 		return inputFile;
@@ -33,19 +31,4 @@ public class ComunOptions {
 		this.outputFile = outputFile;
 	}
 
-	public List<Integer> getCampoLongitudes() {
-		return campoLongitudes;
-	}
-
-	public void setCampoLongitudes(List<Integer> campoLongitudes) {
-		this.campoLongitudes = campoLongitudes;
-	}
-
-	public List<Boolean> getCampoIgnorados() {
-		return campoIgnorados;
-	}
-
-	public void setCampoIgnorados(List<Boolean> campoIgnorados) {
-		this.campoIgnorados = campoIgnorados;
-	}
 }

@@ -10,21 +10,26 @@ import java.util.Set;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import global.NTextPosUtils; // Tu librería nativa corregida para texto fijo
+import global.NTextPosUtils; 
 import global.options.ComunOptions;
 import global.options.TaskOptions;
 import global.task.Task;
+import record.RecordDefinition; // Importamos el contenedor
 
 public class UnitaryTransformations {
 
 	private Task uTask;
 	private ComunOptions opts;
 	private TaskOptions optsTask;
+	// Nueva propiedad para almacenar el mapa de configuraciones posicionales
+	private Map<String, RecordDefinition> mapaDefiniciones;
 
-	public UnitaryTransformations(Task task, ComunOptions opts, TaskOptions optsTask) {
+	// Modificamos el constructor para recibir el mapa de definiciones desde NTextPos
+	public UnitaryTransformations(Task task, ComunOptions opts, TaskOptions optsTask, Map<String, RecordDefinition> mapaDefiniciones) {
 		this.opts = opts;
 		this.optsTask = optsTask;
 		this.uTask = task;
+		this.mapaDefiniciones = mapaDefiniciones;
 	}
 
 	/**
@@ -32,7 +37,7 @@ public class UnitaryTransformations {
 	 * 
 	 * @param rowInput            Mapa con los datos indexados por posición ("p0", "p1"...)
 	 * @param originalPositionRow Índice secuencial de la línea actual en el archivo.
-	 * @param campoLongitudes     Lista de longitudes obtenidas del XML.
+	 * @param campoLongitudes     Lista de longitudes obtenidas dinámicamente para ESTE tipo de registro.
 	 * @return true si la fila procesada fue válida o guardada.
 	 */
 	private boolean processRowTask(Map<String, Object> rowInput, int originalPositionRow, List<Integer> campoLongitudes) throws IOException {
@@ -74,8 +79,6 @@ public class UnitaryTransformations {
 			case ObtenerFilaColumnaContiene:
 			    modeFilterContains = this.optsTask.get("mode") != null ? (Integer) this.optsTask.get("mode") : 0;
 			    
-			    // 1. Extraemos de forma segura el texto de búsqueda. 
-			    // Si viene como array [Ljava.lang.String;, tomamos la primera posición [0]
 			    String textoBuscado = "";
 			    if (this.optsTask.get("rowText") instanceof String[]) {
 			        String[] arr = (String[]) this.optsTask.get("rowText");
@@ -94,7 +97,6 @@ public class UnitaryTransformations {
 			case BorrarFilaColumnaContiene:
 			    modeFilterContains = this.optsTask.get("mode") != null ? (Integer) this.optsTask.get("mode") : 0;
 			    
-			    // Aplicamos la misma extracción segura para el borrado
 			    String textoBorrar = "";
 			    if (this.optsTask.get("rowText") instanceof String[]) {
 			        String[] arr = (String[]) this.optsTask.get("rowText");
@@ -142,38 +144,100 @@ public class UnitaryTransformations {
 		}
 		return addRow;
 	}
+	
+	private String checkTypeRow(String line) {
+	    // 1. Si solo hay un tipo en el mapa, devolvemos "t1" directamente sin evaluar la línea
+	    if (this.mapaDefiniciones.size() <= 1) {
+	        return "default";
+	    }
+
+	    // 2. Usamos las coordenadas de "t1" para saber en qué posición de la línea viene el tipo
+	    RecordDefinition ref = this.mapaDefiniciones.get("default");
+
+	    if (ref != null && ref.getLengthType() > 0) {
+	        int inicio = ref.getPosType() - 1;
+	        int fin = inicio + ref.getLengthType();
+
+	        if (line.length() >= fin) {
+	            String tipoExtraido = line.substring(inicio, fin);
+	            // Si el tipo extraído de la línea existe en el mapa (ej: "t2"), lo devolvemos
+	            if (this.mapaDefiniciones.containsKey(tipoExtraido)) {
+	                return tipoExtraido;
+	            }
+	        }
+	    }
+	    // 3. Si no coincide con ninguna estructura específica, es un registro genérico
+	    return "default";
+	}
+	private Boolean workWithLineType(String line)
+	{
+		if(this.mapaDefiniciones.size()<=1)
+		{
+			return true;
+		}
+		else
+		{			
+			String[] typeInChange;
+			Object typeObj = this.optsTask.get("type");
+			
+			if (typeObj instanceof String[]) {
+				typeInChange = (String[]) typeObj;
+			} else if (typeObj instanceof String) {
+				typeInChange = new String[]{(String) typeObj};
+			} else {
+				typeInChange = null;
+			}
+			if (typeInChange != null && Arrays.asList(typeInChange).contains(this.checkTypeRow(line))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	private RecordDefinition obtenerDefinicionDeLinea(String linea) {
+		   return this.mapaDefiniciones.get(checkTypeRow(linea));
+	}
+
 
 	/**
-	 * Realiza la lectura secuencial de texto plano y mapea dinámicamente según el XML.
+	 * Realiza la lectura secuencial de texto plano y mapea dinámicamente según el XML por cada tipo.
 	 */
 	public Boolean getOutputFileCheckByRow() {
 		try {
 			BufferedReader reader = (BufferedReader) this.opts.getInputFile();
-			
-			// IMPORTANTE: Asegúrate de añadir el getter getCampoLongitudes() o pasarlo en las opciones comunes.
-			List<Integer> campoLongitudes = this.opts.getCampoLongitudes();
-			List<Boolean> campoIgnorados = this.opts.getCampoIgnorados();
-			
 			int contOriginal = 0;
 			String line;
 
-			// Leemos línea a línea el archivo sin procesar de forma ultra-eficiente
+
+			// Procesamos línea a línea de forma ultra-eficiente (Memoria constante)
 			while ((line = reader.readLine()) != null) {
+				if (line.isEmpty()) continue;
+				if(!this.workWithLineType(line)) continue;
+				// 1. Resolvemos dinámicamente el layout de campos para ESTA línea concreta (O(1))
+				RecordDefinition defActual = this.obtenerDefinicionDeLinea(line);
+				if (defActual == null) {
+					throw new RuntimeException("No se encontró una estructura de definición válida para la línea: " + contOriginal);
+				}
+
+				List<Integer> campoLongitudes = defActual.getLongitudes();
+				List<Boolean> campoIgnorados = defActual.getIgnorados();
+
 				Map<String, Object> row = new HashMap<>();
 				int currentPointer = 0;
 
-				// Troceamos dinámicamente la fila usando el mapa de longitudes cargado del XML
+				// 2. Troceamos la línea basándonos exclusivamente en su tipo de registro correspondiente
 				for (int i = 0; i < campoLongitudes.size(); i++) {
 					if (currentPointer >= line.length()) break;
 					
 					int length = campoLongitudes.get(i);
 					int endPointer = Math.min(currentPointer + length, line.length());
 					
-					if (campoIgnorados == null || !campoIgnorados.get(i)) {
+					if (campoIgnorados == null || i >= campoIgnorados.size() || !campoIgnorados.get(i)) {
 						row.put("p" + i, line.substring(currentPointer, endPointer));
 					}
 					currentPointer += length;
 				}
+				
+				// 3. Pasamos las longitudes del tipo de registro mapeado para que NTextPosUtils re-escriba con el formato exacto
 				
 				this.processRowTask(row, contOriginal, campoLongitudes);
 				contOriginal++;

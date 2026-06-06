@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <record name="linea1">
+      
+      <field name="codProv" length="2" label="Código Provincia"  />
+      <field name="codMun" length="3" label="Código Municipio"  />
+      <field name="codVia" length="5" label="Código Vía"/>
+      <field name="nombre" length="30" label="Nombre Corto"  />
+      <field name="fechRef" length="8" label="Fecha Referencia"/>
+      <field name="pIgnorado" length="1" label="Espacio Control" ignore="true" />
+      <field name="codViaDupl" length="5" label="Código Vía Duplicado"/>
+      <field name="nombreLargo" length="50"  label="Tipo y Nombre Completo"/>
+      <field name="nombreLimpio" length="25"  label="Nombre Limpio" />
+
+    </record>
+    
+</definitions>

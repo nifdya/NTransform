@@ -42,7 +42,8 @@ public class MainFrame extends JFrame {
     private final String[] jsonFiles = {
         "config_csv.json", 
         "config_excel.json",
-        "config_convert.json"
+        "config_convert.json",
+        "config_text.json"
     };
 
     public MainFrame() {
