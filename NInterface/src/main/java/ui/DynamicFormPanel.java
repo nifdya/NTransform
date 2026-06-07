@@ -17,6 +17,7 @@ public class DynamicFormPanel extends JPanel {
 	private final ArrayList< CmdOptionsConfig> cmdOptions;
 
 	private final Map<String, JComponent> fieldsMap = new HashMap<>();
+	private final Map<String, JComponent> fieldsOptMap = new HashMap<>();
 
 	public DynamicFormPanel(TaskConfig task) {
 		this.paramsConfig = task.getParams();
@@ -86,7 +87,7 @@ public class DynamicFormPanel extends JPanel {
 			}
 			component.setToolTipText(desc); // Asigna el tooltip al campo de entrada
 			add(component, gbc);
-			fieldsMap.put(paramName, component);
+			fieldsOptMap.put(paramName, component);
 			row++;
 		}	
 		return row;
@@ -222,6 +223,45 @@ public class DynamicFormPanel extends JPanel {
 				}
 			}
 		}
+		if(this.cmdOptions!=null && this.cmdOptions.size()>0)
+		{
+			for (CmdOptionsConfig config : this.cmdOptions) {
+				String paramName = config.getName();
+				JComponent comp = fieldsOptMap.get(paramName);
+				
+				if (comp == null)
+					continue;
+				
+				// Restaurar estado visual por defecto antes de validar de nuevo
+				String defaultDesc = config.getDescription() != null ? config.getDescription() : "";
+				comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
+				comp.setToolTipText(defaultDesc);
+				
+				// 1. Extraer el valor actual del componente en formato String
+				String value = "";
+				if (comp instanceof JTextField) {
+					value = ((JTextField) comp).getText().trim();
+				} else if (comp instanceof JComboBox) {
+					Object selected = ((JComboBox<?>) comp).getSelectedItem();
+					value = (selected != null) ? selected.toString().trim() : "";
+				} else if (comp instanceof JSpinner) {
+					value = ((JSpinner) comp).getValue().toString();
+				} else if (comp instanceof JCheckBox) {
+					value = ((JCheckBox) comp).isSelected() ? "true" : "false";
+				}
+				
+				// 2. Validación de Campos Obligatorios
+				if (config.isRequired() && value.isEmpty()) {
+					comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+					comp.setToolTipText("Este campo es obligatorio.");
+					isValid = false;
+					continue; // Pasa al siguiente campo
+				}
+				
+				
+			}			
+		}
+
 
 		// Refresca visualmente el panel para aplicar los cambios de borde de inmediato
 		repaint();
@@ -255,6 +295,46 @@ public class DynamicFormPanel extends JPanel {
 				if (sb.length() > 0)
 					sb.append("|");
 				sb.append(param).append("=").append(val);
+			}
+		}
+		return sb.toString();
+	}
+	public String getOptionCmdOption(String name)
+	{
+		CmdOptionsConfig config = null;
+		for (CmdOptionsConfig cmd : this.cmdOptions) {
+		    if (name.equals(cmd.getName())) {
+		        config = cmd;
+		        break; // Detiene la búsqueda al encontrar el primero
+		    }
+		}
+		return config.getOption();
+
+	}
+	public String getSerializedCmdOptions() {
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, JComponent> entry : fieldsOptMap.entrySet()) {
+			String param = entry.getKey();
+			JComponent comp = entry.getValue();
+			String val = "";
+			String opt="";
+			
+			if (comp instanceof JCheckBox) {
+				val = ((JCheckBox) comp).isSelected() ? "true" : "";
+			} else if (comp instanceof JComboBox) {
+				val = (String) ((JComboBox<?>) comp).getSelectedItem();
+			} else if (comp instanceof JSpinner) {
+				int num = (Integer) ((JSpinner) comp).getValue();
+				val = num > 0 ? String.valueOf(num) : "";
+			} else if (comp instanceof JTextField) {
+				val = ((JTextField) comp).getText().trim();
+			}
+			
+			if (val != null && !val.isEmpty()) {
+				opt=this.getOptionCmdOption(param);
+				if (sb.length() > 0)
+					sb.append(" ");
+				sb.append(opt).append(" ").append(val);
 			}
 		}
 		return sb.toString();

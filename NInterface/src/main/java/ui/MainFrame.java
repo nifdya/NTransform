@@ -40,11 +40,31 @@ public class MainFrame extends JFrame {
     
     // Listado de tus 6 archivos de configuración JSON
     private final String[] jsonFiles = {
+    	"config_convert.json",
         "config_csv.json", 
         "config_excel.json",
-        "config_convert.json",
         "config_text.json"
     };
+    
+    private String getNodeJarForJsonFile(String jsonFile)
+    {
+    	String node="";
+    	switch (jsonFile) {
+		case "config_csv.json":
+			node="NCSV.jar";
+			break;
+		case "config_excel.json":
+			node="NExcel.jar";
+			break;
+		case "config_convert.json":
+			node="N2Convert.jar";
+			break;
+		case "config_text.json":
+			node="NTextPos.jar";
+			break;
+		}
+    	return node;
+    }
 
     public MainFrame() {
         setTitle("Constructor de Pipelines Multi-JSON NExcel");
@@ -154,7 +174,7 @@ public class MainFrame extends JFrame {
         JPanel bottomContainer = new JPanel(new BorderLayout(5, 5));
         bottomContainer.setBorder(BorderFactory.createTitledBorder("Instrucciones Acumuladas en el Pipeline Actual"));
 
-        String[] columnas = {"Paso", "Origen (JSON)", "Instrucción / Tarea Generada"};
+        String[] columnas = {"Paso", "Origen (JSON)","Opc Comando", "Instrucción / Tarea Generada"};
         tableModel = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { 
@@ -246,10 +266,12 @@ public class MainFrame extends JFrame {
         if(activeForm.validateForm())
         {
             String serializedParams = activeForm.getSerializedParams();
+            String serializedCmdOptions = activeForm.getSerializedCmdOptions();
 
             String tareaCompleta = selectedTask.getTask();
+
             if (!serializedParams.isEmpty()) {
-                tareaCompleta += "|" + serializedParams;
+            	tareaCompleta += "|" + serializedParams;
             }
 
             // Se guarda en la lista interna sin verse afectada si el usuario cambia de JSON
@@ -257,7 +279,7 @@ public class MainFrame extends JFrame {
             int siguientePaso = instruccionesAgregadas.size();
             String jsonOrigen = (String) configSelector.getSelectedItem();
             
-            tableModel.addRow(new Object[]{siguientePaso, jsonOrigen, tareaCompleta});	
+            tableModel.addRow(new Object[]{siguientePaso, jsonOrigen, serializedCmdOptions,tareaCompleta});	
         }
 
     }
@@ -290,26 +312,42 @@ public class MainFrame extends JFrame {
 
                 // 2. Crear el array contenedor de instrucciones principales
                 ArrayNode instruccionesArray = objectMapper.createArrayNode();
-                
-                // 3. Iterar sobre la lista de instrucciones acumuladas (mantenidas de forma persistente)
-                for (int i = 0; i < instruccionesAgregadas.size(); i++) {
-                    ObjectNode pasoNode = objectMapper.createObjectNode();
-                    pasoNode.put("jar", "NExcel.jar");
-                    pasoNode.put("manteneSiError", true);
-                    pasoNode.put("paso", String.valueOf(i + 1)); // El paso se autoincrementa según su orden (1, 2, 3...)
 
-                    // Crear el array 'c' interno solicitado en tu formato plantilla
-                    ArrayNode cArray = objectMapper.createArrayNode();
-                    ObjectNode tareaNode = objectMapper.createObjectNode();
-                    tareaNode.put("tarea", instruccionesAgregadas.get(i)); // Ej: "BorrarColumnasPosiciones|colPositions=3"
-                    cArray.add(tareaNode);
+                int filas = tableModel.getRowCount();
+                int indexFile=1;
+                int indexOptCmd=2;
+                int indexTask=3;
 
-                    // Vincular el array 'c' a la instrucción de este paso
-                    pasoNode.set("c", cArray);
-                    
-                    // Añadir el bloque del paso al listado global de instrucciones
-                    instruccionesArray.add(pasoNode);
+                for (int i = 0; i < filas; i++) {
+                		String cmdOpts=tableModel.getValueAt(i, indexOptCmd).toString();
+
+                        //Object valor = tableModel.getValueAt(i, j);
+                        ObjectNode node = objectMapper.createObjectNode();
+                        //set jar
+                        node.put("jar", this.getNodeJarForJsonFile(tableModel.getValueAt(i, indexFile).toString()));
+                        //set 
+                        node.put("manteneSiError", true);
+                        node.put("paso", String.valueOf(i + 1)); // El paso se autoincrementa según su orden (1, 2, 3...)
+                        if(!cmdOpts.isEmpty())
+                        {
+                        	node.put("cmdOptions", cmdOpts);
+                        }
+                        // Crear el array 'tarea' interno solicitado en tu formato plantilla
+                        ArrayNode cArray = objectMapper.createArrayNode();
+                        ObjectNode task = objectMapper.createObjectNode();
+                        task.put("tarea", instruccionesAgregadas.get(i)); // Ej: "BorrarColumnasPosiciones|colPositions=3"
+                        cArray.add(task);
+
+                        // Vincular el array 'c' a la instrucción de este paso
+                        node.set("tareas", cArray);
+                        
+                        // Añadir el bloque del paso al listado global de instrucciones
+                        instruccionesArray.add(node);
+                        
                 }
+                
+                
+          
 
                 // Vincular el array completo de instrucciones al nodo raíz
                 rootNode.set("instrucciones", instruccionesArray);

@@ -4,6 +4,7 @@ public class CmdOptionsConfig {
 	private String name;
 	private boolean required;
 	private String description;
+	private String option;
 	private Object defaultValue;
 	
 	// Getters y Setters
@@ -29,6 +30,13 @@ public class CmdOptionsConfig {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public String getOption() {
+		return option;
+	}
+	
+	public void setOption(String option) {
+		this.option = option;
 	}
 
 	public Object getDefaultValue() {
