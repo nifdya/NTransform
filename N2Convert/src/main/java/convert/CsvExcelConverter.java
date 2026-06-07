@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class CsvExcelConverter {
@@ -24,8 +25,8 @@ public class CsvExcelConverter {
      * PROCESO 1: CSV -> XLSX
      * Lee un CSV de forma segura (soportando saltos de línea o comillas internas)
      */
-    public static void csvToXlsx(String csvPath, String xlsxPath) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, StandardCharsets.UTF_8));
+    public static void csvToXlsx(String csvPath, String xlsxPath, Charset charset) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, charset));
              CSVParser csvParser = new CSVParser(reader, EXCEL_CSV_FORMAT);
              Workbook workbook = new XSSFWorkbook()) {
 
@@ -52,13 +53,13 @@ public class CsvExcelConverter {
      * PROCESO INVERSO: XLSX -> CSV
      * Lee un Excel y genera un CSV escapando caracteres de forma automática
      */
-    public static void xlsxToCsv(String xlsxPath, String csvPath) throws IOException {
+    public static void xlsxToCsv(String xlsxPath, String csvPath, Charset charset) throws IOException {
         // DataFormatter es clave: lee las celdas tal y como se ven en Excel
         DataFormatter dataFormatter = new DataFormatter();
 
         try (InputStream fileIn = new FileInputStream(xlsxPath);
              Workbook workbook = WorkbookFactory.create(fileIn);
-             BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, StandardCharsets.UTF_8));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, charset));
              CSVPrinter csvPrinter = new CSVPrinter(writer, EXCEL_CSV_FORMAT)) {
 
             // Procesamos la primera hoja

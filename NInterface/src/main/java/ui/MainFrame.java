@@ -218,7 +218,7 @@ public class MainFrame extends JFrame {
                     listModel.addElement(task); 
                     
                     // Inyección automática de parámetros
-                    DynamicFormPanel form = new DynamicFormPanel(task.getParams());
+                    DynamicFormPanel form = new DynamicFormPanel(task);
                     formsMap.put(name, form);
                     cardsPanel.add(form, name);
                 }

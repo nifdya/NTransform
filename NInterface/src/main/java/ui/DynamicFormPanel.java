@@ -1,181 +1,262 @@
 package ui;
 
 import javax.swing.*;
+
+import global.task.CmdOptionsConfig;
 import global.task.ParamConfig;
+import global.task.TaskConfig;
+
 import java.awt.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class DynamicFormPanel extends JPanel {
-    private final Map<String, ParamConfig> paramsConfig;
-    private final Map<String, JComponent> fieldsMap = new HashMap<>();
+	private final Map<String, ParamConfig> paramsConfig;
+	private final ArrayList< CmdOptionsConfig> cmdOptions;
 
-    public DynamicFormPanel(Map<String, ParamConfig> paramsConfig) {
-        this.paramsConfig = paramsConfig;
-        setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        buildForm();
-    }
+	private final Map<String, JComponent> fieldsMap = new HashMap<>();
 
-    private void buildForm() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        int row = 0;
+	public DynamicFormPanel(TaskConfig task) {
+		this.paramsConfig = task.getParams();
+		this.cmdOptions = (ArrayList<CmdOptionsConfig>) task.getCmdOptions();
+		
+		setLayout(new GridBagLayout());
+		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		buildForm();
+	}
+	
+	private int buildFormParams(GridBagConstraints gbc, int row)
+	{
+		for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
+			String paramName = entry.getKey();
+			ParamConfig prop = entry.getValue();
+			String desc = prop.getDescription() != null ? prop.getDescription() : "";
 
-        if (paramsConfig == null) return;
+			// 1. Etiqueta con Tooltip (Punto 2)
+			gbc.gridx = 0;
+			gbc.gridy = row;
+			gbc.weightx = 0.3;
+			String labelText = paramName + (prop.isRequired() ? " *" : "");
+			JLabel label = new JLabel(labelText);
+			label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
+			add(label, gbc);
 
-        for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
-            String paramName = entry.getKey();
-            ParamConfig prop = entry.getValue();
-            String desc = prop.getDescription() != null ? prop.getDescription() : "";
+			// 2. Componente de entrada con Tooltip (Punto 2)
+			gbc.gridx = 1;
+			gbc.weightx = 0.7;
+			JComponent inputComponent = createComponentForType(prop.getType(), desc);
+			inputComponent.setToolTipText(desc); // Asigna el tooltip al campo de entrada
+			add(inputComponent, gbc);
 
-            // 1. Etiqueta con Tooltip (Punto 2)
-            gbc.gridx = 0;
-            gbc.gridy = row;
-            gbc.weightx = 0.3;
-            String labelText = paramName + (prop.isRequired() ? " *" : "");
-            JLabel label = new JLabel(labelText);
-            label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
-            add(label, gbc);
+			fieldsMap.put(paramName, inputComponent);
+			row++;
+		}	
+		return row;
+	}
+	private int buildFormCmdOptions(GridBagConstraints gbc, int row)
+	{
+		for (CmdOptionsConfig cmdConfig: this.cmdOptions)
+		{
+			String paramName = cmdConfig.getName();
+			
+			String desc = cmdConfig.getDescription() != null ? cmdConfig.getDescription() : "";
+			
+			// 1. Etiqueta con Tooltip (Punto 2)
+			gbc.gridx = 0;
+			gbc.gridy = row;
+			gbc.weightx = 0.3;
+			String labelText = paramName + (cmdConfig.isRequired() ? " *" : "");
+			JLabel label = new JLabel(labelText);
+			label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
+			add(label, gbc);
+			
+			// 2. Componente de entrada con Tooltip (Punto 2)
+			gbc.gridx = 1;
+			gbc.weightx = 0.7;
+			JComponent component=null;
+			if(paramName.equals("charset"))
+			{
+				component=createComponentForType("Charset", desc);
+			}
+			else
+			{
+				component = createComponentForType("String", desc);
+			}
+			component.setToolTipText(desc); // Asigna el tooltip al campo de entrada
+			add(component, gbc);
+			fieldsMap.put(paramName, component);
+			row++;
+		}	
+		return row;
+	}
 
-            // 2. Componente de entrada con Tooltip (Punto 2)
-            gbc.gridx = 1;
-            gbc.weightx = 0.7;
-            JComponent inputComponent = createComponentForType(prop.getType(), desc);
-            inputComponent.setToolTipText(desc); // Asigna el tooltip al campo de entrada
-            add(inputComponent, gbc);
+	private void buildForm() {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		int row = 0;
 
-            fieldsMap.put(paramName, inputComponent);
-            row++;
-        }
-    }
+		if(cmdOptions!=null && cmdOptions.size()>0)
+		{
+			row=this.buildFormCmdOptions(gbc, row);
+		}
+		if (paramsConfig != null) {
+			row=this.buildFormParams(gbc,row);
+		}
+		
+	}
+	private JComboBox<String> createCharsetCombo()
+	{
 
-    private JComponent createComponentForType(String type, String description) {
-        switch (type) {
-            case "Boolean":
-                return new JCheckBox("Activar");
-            case "String":
-                if (description.contains("Valores posibles:")) {
-                    return new JComboBox<>(new String[]{"", "E", "I"});
-                }
-                return new JTextField(20);
-            case "Integer":
-                return new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-            case "ListInteger":
-            case "ListString":
-                return new JTextField(20);
-            default:
-                return new JTextField(20);
-        }
-    }
+        // Arreglo con los nombres de los charsets nativos
+        String[] charsets = {
+            StandardCharsets.US_ASCII.name(),
+            StandardCharsets.ISO_8859_1.name(),
+            StandardCharsets.UTF_8.name(),
+            StandardCharsets.UTF_16BE.name(),
+            StandardCharsets.UTF_16LE.name(),
+            StandardCharsets.UTF_16.name()
+        };
 
-    public boolean validateForm() {
-        boolean isValid = true;
+        JComboBox<String> combo = new JComboBox<>(charsets);
+        
+        // Seleccionar UTF-8 por defecto de forma segura
+        combo.setSelectedItem(StandardCharsets.UTF_8.name());
+        return combo;
+	}
 
-        for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
-            String paramName = entry.getKey();
-            ParamConfig prop = entry.getValue();
-            JComponent comp = fieldsMap.get(paramName);
-            
-            if (comp == null) continue;
+	private JComponent createComponentForType(String type, String description) {
+		switch (type) {
+		case "Boolean":
+			return new JCheckBox("Activar");
+		case "String":
+			if (description.contains("Valores posibles:")) {
+				return new JComboBox<>(new String[] { "", "E", "I" });
+			}
+			return new JTextField(20);
+		case "Integer":
+			return new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+		case "ListInteger":
+		case "ListString":
+			return new JTextField(20);
+		case "Charset":
+			return this.createCharsetCombo();
+		default:
+			return new JTextField(20);
+		}
+	}
 
-            // Restaurar estado visual por defecto antes de validar de nuevo
-            String defaultDesc = prop.getDescription() != null ? prop.getDescription() : "";
-            comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
-            comp.setToolTipText(defaultDesc);
+	public boolean validateForm() {
+		boolean isValid = true;
 
-            // 1. Extraer el valor actual del componente en formato String
-            String value = "";
-            if (comp instanceof JTextField) {
-                value = ((JTextField) comp).getText().trim();
-            } else if (comp instanceof JComboBox) {
-                Object selected = ((JComboBox<?>) comp).getSelectedItem();
-                value = (selected != null) ? selected.toString().trim() : "";
-            } else if (comp instanceof JSpinner) {
-                value = ((JSpinner) comp).getValue().toString();
-            } else if (comp instanceof JCheckBox) {
-                value = ((JCheckBox) comp).isSelected() ? "true" : "false";
-            }
+		for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
+			String paramName = entry.getKey();
+			ParamConfig prop = entry.getValue();
+			JComponent comp = fieldsMap.get(paramName);
 
-            // 2. Validación de Campos Obligatorios
-            if (prop.isRequired() && value.isEmpty()) {
-                comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                comp.setToolTipText("Este campo es obligatorio.");
-                isValid = false;
-                continue; // Pasa al siguiente campo
-            }
+			if (comp == null)
+				continue;
 
-            // 3. Validación de Tipos de Datos (solo si tiene contenido)
-            if (!value.isEmpty()) {
-                boolean typeError = false;
-                String errorMsg = "";
+			// Restaurar estado visual por defecto antes de validar de nuevo
+			String defaultDesc = prop.getDescription() != null ? prop.getDescription() : "";
+			comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
+			comp.setToolTipText(defaultDesc);
 
-                switch (prop.getType()) {
-                    case "Integer":
-                        try {
-                            Integer.parseInt(value);
-                        } catch (NumberFormatException e) {
-                            typeError = true;
-                            errorMsg = "Debe ser un número entero válido.";
-                        }
-                        break;
+			// 1. Extraer el valor actual del componente en formato String
+			String value = "";
+			if (comp instanceof JTextField) {
+				value = ((JTextField) comp).getText().trim();
+			} else if (comp instanceof JComboBox) {
+				Object selected = ((JComboBox<?>) comp).getSelectedItem();
+				value = (selected != null) ? selected.toString().trim() : "";
+			} else if (comp instanceof JSpinner) {
+				value = ((JSpinner) comp).getValue().toString();
+			} else if (comp instanceof JCheckBox) {
+				value = ((JCheckBox) comp).isSelected() ? "true" : "false";
+			}
 
-                    case "ListInteger":
-                        if (!value.matches("^-?\\d+(;-?\\d+)*$")) {
-                            typeError = true;
-                            errorMsg = "Formato incorrecto. Use números separados por punto y coma (ej: 1;2;3).";
-                        }
-                        break;
+			// 2. Validación de Campos Obligatorios
+			if (prop.isRequired() && value.isEmpty()) {
+				comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+				comp.setToolTipText("Este campo es obligatorio.");
+				isValid = false;
+				continue; // Pasa al siguiente campo
+			}
 
-                    case "ListString":
-                        if (!value.matches("^[^;]+(;[^;]+)*$")) {
-                            typeError = true;
-                            errorMsg = "Formato incorrecto. Use textos separados por punto y coma (ej: texto1;texto2).";
-                        }
-                        break;
-                }
+			// 3. Validación de Tipos de Datos (solo si tiene contenido)
+			if (!value.isEmpty()) {
+				boolean typeError = false;
+				String errorMsg = "";
 
-                if (typeError) {
-                    comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                    comp.setToolTipText(errorMsg);
-                    isValid = false;
-                }
-            }
-        }
+				switch (prop.getType()) {
+				case "Integer":
+					try {
+						Integer.parseInt(value);
+					} catch (NumberFormatException e) {
+						typeError = true;
+						errorMsg = "Debe ser un número entero válido.";
+					}
+					break;
 
-        // Refresca visualmente el panel para aplicar los cambios de borde de inmediato
-        repaint(); 
-        return isValid;
-    }
-   
-    /**
-     * Devuelve los parámetros formateados en formato clave=valor unidos por tuberías.
-     */
-    public String getSerializedParams() {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, JComponent> entry : fieldsMap.entrySet()) {
-            String param = entry.getKey();
-            JComponent comp = entry.getValue();
-            String val = "";
+				case "ListInteger":
+					if (!value.matches("^-?\\d+(;-?\\d+)*$")) {
+						typeError = true;
+						errorMsg = "Formato incorrecto. Use números separados por punto y coma (ej: 1;2;3).";
+					}
+					break;
 
-            if (comp instanceof JCheckBox) {
-                val = ((JCheckBox) comp).isSelected() ? "true" : "";
-            } else if (comp instanceof JComboBox) {
-                val = (String) ((JComboBox<?>) comp).getSelectedItem();
-            } else if (comp instanceof JSpinner) {
-                // Evitamos volcar ceros si no son obligatorios para mantener limpio el pipeline
-                int num = (Integer) ((JSpinner) comp).getValue();
-                val = num > 0 ? String.valueOf(num) : "";
-            } else if (comp instanceof JTextField) {
-                val = ((JTextField) comp).getText().trim();
-            }
+				case "ListString":
+					if (!value.matches("^[^;]+(;[^;]+)*$")) {
+						typeError = true;
+						errorMsg = "Formato incorrecto. Use textos separados por punto y coma (ej: texto1;texto2).";
+					}
+					break;
+				}
 
-            if (val != null && !val.isEmpty()) { 
-                if (sb.length() > 0) sb.append("|");
-                sb.append(param).append("=").append(val);
-            }
-        }
-        return sb.toString();
-    }
+				if (typeError) {
+					comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+					comp.setToolTipText(errorMsg);
+					isValid = false;
+				}
+			}
+		}
+
+		// Refresca visualmente el panel para aplicar los cambios de borde de inmediato
+		repaint();
+		return isValid;
+	}
+
+	/**
+	 * Devuelve los parámetros formateados en formato clave=valor unidos por
+	 * tuberías.
+	 */
+	public String getSerializedParams() {
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, JComponent> entry : fieldsMap.entrySet()) {
+			String param = entry.getKey();
+			JComponent comp = entry.getValue();
+			String val = "";
+
+			if (comp instanceof JCheckBox) {
+				val = ((JCheckBox) comp).isSelected() ? "true" : "";
+			} else if (comp instanceof JComboBox) {
+				val = (String) ((JComboBox<?>) comp).getSelectedItem();
+			} else if (comp instanceof JSpinner) {
+				// Evitamos volcar ceros si no son obligatorios para mantener limpio el pipeline
+				int num = (Integer) ((JSpinner) comp).getValue();
+				val = num > 0 ? String.valueOf(num) : "";
+			} else if (comp instanceof JTextField) {
+				val = ((JTextField) comp).getText().trim();
+			}
+
+			if (val != null && !val.isEmpty()) {
+				if (sb.length() > 0)
+					sb.append("|");
+				sb.append(param).append("=").append(val);
+			}
+		}
+		return sb.toString();
+	}
 }

@@ -2,16 +2,175 @@
   {
     "task": "XLS2XLSX",
 	"description":"Convierte el fichero de XLS a XLSX",
-	"params": { }
+	"params": { }, 
+	"cmdOptions":[]
   },
   {
     "task": "CSV2XLSX",
 	"description":"Convierte el fichero de CSV a XLSX",
-	"params": { }
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+		]
   },
   {
     "task": "XLSX2CSV",
 	"description":"Convierte el fichero de XLSX a CSV",
-	"params": { }
-  }
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+		]
+	},
+  {
+    "task": "TXT2CSV",
+	"description":"Convierte el fichero de TXT a CSV",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
+  {
+    "task": "CSV2TXT",
+	"description":"Convierte el fichero de CSV a TXT",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	}, 
+  {
+    "task": "XLSX2TXT",
+	"description":"Convierte el fichero de XLSX a TXT",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
+  {
+    "task": "TXT2XLSX",
+	"description":"Convierte el fichero de TXT a XLSX",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
+  {
+    "task": "TXT2JSON",
+	"description":"Convierte el fichero de TXT a JSON",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
+  {
+    "task": "TXT2XML",
+	"description":"Convierte el fichero de TXT a XML",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
+  {
+    "task": "CSV2JSON",
+	"description":"Convierte el fichero de CSV a JSON",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+		]
+	},
+  {
+    "task": "CSV2XML",
+	"description":"Convierte el fichero de CSV a XML",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
+			{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+		]
+	},
+  {
+    "task": "XLSX2JSON",
+	"description":"Convierte el fichero de XLSX a JSON",
+	"params": { },
+	"cmdOptions": [	]
+	},
+ 
+  {
+    "task": "XLSX2XML",
+	"description":"Convierte el fichero de XLSX a XML",
+	"params": { },
+	"cmdOptions": [	]
+	},
+	{
+	 	"task": "JSON2TXT",
+		"description":"Convierte el fichero de JSON a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"fdefinitions","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			]
+	},
+	{
+	 	"task": "JSON2CSV",
+		"description":"Convierte el fichero de JSON a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},
+
+	 {
+	   "task": "JSON2XSLX",
+	"description":"Convierte el fichero de JSON a XLSX",
+	"params": { },
+	"cmdOptions": [	]
+	},
+	{
+	 	"task": "XML2TXT",
+		"description":"Convierte el fichero de XML a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},	
+	{
+	 	"task": "XML2CSV",
+		"description":"Convierte el fichero de XML a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},
+	{
+	 "task": "XML2XLSX",
+	"description":"Convierte el fichero de XML a XLSX",
+	"params": { },
+	"cmdOptions": [	]
+	}
 ]
