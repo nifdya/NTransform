@@ -10,25 +10,25 @@ import java.util.List;
 public class CoordExecutor {
 
     public void executePipeline(ComunOptions config) {
-        List<Instruccion> commands = config.instrucciones;
+        List<Command> commands = config.commands;
         if (commands == null || commands.isEmpty()) {
             System.out.println("⚠ No hay instrucciones para ejecutar.");
             return;
         }
 
         // El origen arranca con el fichero inicial global
-        String orgCurrentFile = config.ficheroInicial;
+        String orgCurrentFile = config.inputFile;
 
         System.out.println("🚀 Iniciando Pipeline Complejo...");
-        System.out.println("📥 Fichero Inicial: " + config.ficheroInicial);
-        System.out.println("📤 Fichero Final:   " + config.ficheroFinal);
+        System.out.println("📥 Fichero Inicial: " + config.inputFile);
+        System.out.println("📤 Fichero Final:   " + config.outputFile);
 
         for (int i = 0; i < commands.size(); i++) {
-            Instruccion block = commands.get(i);
+            Command block = commands.get(i);
      
             
             System.out.println("\n==================================================");
-            System.out.println("📦 INSTRUCCIÓN PASO " + block.paso + " | Ejecutable: " + block.jar);
+            System.out.println("📦 INSTRUCCIÓN PASO " + block.step + " | Ejecutable: " + block.jar);
             System.out.println("==================================================");
 
             String subTaskStr="";
@@ -36,23 +36,23 @@ public class CoordExecutor {
             boolean isLastCommand = (i == commands.size() - 1);
             String destCurrentFile;            
             
-            if (block.tareas == null || block.tareas.isEmpty()) {
+            if (block.tasks == null || block.tasks.isEmpty()) {
                 System.out.println("⚠ Este bloque no contiene tareas internas. Saltando...");
                 continue;
             }
             else
             {           	
-            	for (SubTarea subTask : block.tareas) {
+            	for (SubTarea subTask : block.tasks) {
             		subTaskStr += " " + subTask.toString();
             		subTaskStrCMD += " " + subTask.toString();
             	}	
             }
 
             try {
-            	System.out.println("Ficheros intermedios:  " + config.ficherosIntermedios);
-            	System.out.println("Paso:  " +  block.paso);
-            	System.out.println("Replace:  " +  config.ficherosIntermedios.replace("[[PASO]]", block.paso)); 
-            	destCurrentFile = isLastCommand ? config.ficheroFinal : config.ficherosIntermedios.replace("[[PASO]]", block.paso);
+            	System.out.println("Ficheros intermedios:  " + config.tempFile);
+            	System.out.println("Paso:  " +  block.step);
+            	System.out.println("Replace:  " +  config.tempFile.replace("[[PASO]]", block.step)); 
+            	destCurrentFile = isLastCommand ? config.outputFile : config.tempFile.replace("[[PASO]]", block.step);
 
                 System.out.println("\n  🔹 Ejecutando Instrucción [" + (i + 1) + "/" + subTaskStr+ "]: " +  subTaskStrCMD);
                 System.out.println("     📥 Entrada: " + orgCurrentFile + " (" + (orgCurrentFile.length() / 1024) + " KB)");
@@ -62,7 +62,7 @@ public class CoordExecutor {
                 boolean ok = executeCommand(block, orgCurrentFile, destCurrentFile);
 
                 if (!ok) {
-                    System.err.println("❌ Fallo en la subtarea: " + block.paso + ". Pipeline abortado.");
+                    System.err.println("❌ Fallo en la subtarea: " + block.step + ". Pipeline abortado.");
                     return;
                 }
 
@@ -73,7 +73,7 @@ public class CoordExecutor {
                  orgCurrentFile = destCurrentFile;
 
             } catch (Exception e) {
-                System.err.println("❌ Error crítico de infraestructura en " + block.paso + ": " + e.getMessage());
+                System.err.println("❌ Error crítico de infraestructura en " + block.step + ": " + e.getMessage());
                 return;
             }      
             
@@ -92,10 +92,10 @@ public class CoordExecutor {
         System.out.println("\n🎉 ¡Proceso finalizado por completo! Fichero final generado exitosamente.");
     }
 
-    private boolean executeCommand(Instruccion instruccion, String origen, String destino) {
+    private boolean executeCommand(Command cmd, String origen, String destino) {
         try {
             // 1. Forzar rutas absolutas para evitar que NExcel se pierda de directorio
-            File fileJar = new File(instruccion.jar).getAbsoluteFile();
+            File fileJar = new File(cmd.jar).getAbsoluteFile();
             File fileOrigen = new File(origen).getAbsoluteFile();
             File fileDestino = new File(destino).getAbsoluteFile();
 
@@ -108,10 +108,16 @@ public class CoordExecutor {
             command.add(fileOrigen.getAbsolutePath());
             command.add("-o");
             command.add(fileDestino.getAbsolutePath());
+            
+            // Incluimos las opciones de la instrucción
+            if(!cmd.cmdOptions.isEmpty())
+            {
+            	command.add(cmd.cmdOptions);
+            }
 
             // 2. Agregar cada subtarea con su propio prefijo "-t"
             // Reemplaza 'listaTareas' por el nombre real de tu List
-            for (Object subTask : instruccion.tareas) {
+            for (Object subTask : cmd.tasks) {
                 command.add("-t");
                 command.add(subTask.toString()); 
             }
@@ -131,16 +137,16 @@ public class CoordExecutor {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println("      [" + instruccion.paso + "] " + line);
+                    System.out.println("      [" + cmd.step + "] " + line);
                 }
             }
 
             int exitCode = process.waitFor();
-            System.out.println("     🏁 [" + instruccion.paso + "] Finalizado con código: " + exitCode);
+            System.out.println("     🏁 [" + cmd.step + "] Finalizado con código: " + exitCode);
             return exitCode == 0;
 
         } catch (Exception e) {
-            System.err.println("❌ Error al invocar ProcessBuilder para " + instruccion.paso + ": " + e.getMessage());
+            System.err.println("❌ Error al invocar ProcessBuilder para " + cmd.step + ": " + e.getMessage());
             return false;
         }
     }

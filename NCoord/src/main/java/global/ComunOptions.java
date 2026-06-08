@@ -5,30 +5,31 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ComunOptions {
-    public String ficheroInicial;
-    public String ficheroFinal;
-    public String ficherosIntermedios; // Estructura base (opcional para logs)
-    public List<Instruccion> instrucciones;
+    public String inputFile;
+    public String outputFile;
+    public String tempFile; // Estructura base (opcional para logs)
+    public List<Command> commands;
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-class Instruccion {
+class Command {
     public String jar;
-    public String paso;
-    public Boolean manteneSiError;
-    public List<SubTarea> tareas;
+    public String step;
+    public String cmdOptions;
+    public Boolean keepOnError;
+    public List<SubTarea> tasks;
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 class SubTarea {
-    public String tarea; // Ejemplo: "nomtarea1|p1=v1|p2=v2"
+    public String task; // Ejemplo: "nomtarea1|p1=v1|p2=v2"
 
     public String getNombreLimpio() {
-        if (tarea == null) return "Sin_Nombre";
-        return tarea.split("\\|")[0];
+        if (task == null) return "Sin_Nombre";
+        return task.split("\\|")[0];
     }
     @Override
     public String toString() {
-    	return this.tarea;
+    	return this.task;
     }
 }

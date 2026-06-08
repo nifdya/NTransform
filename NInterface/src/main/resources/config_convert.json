@@ -1,109 +1,176 @@
 [
   {
-    "task": "ObtenerRango",
-	"module":"tunit",
-	"params": { 
-		"range":{"type":"String","required":true,"description":"Rango a copiar"},
-		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
-		"newColInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Columna"}				
-		}
+    "task": "XLS2XLSX",
+	"description":"Convierte el fichero de XLS a XLSX",
+	"params": { }, 
+	"cmdOptions":[]
   },
   {
-    "task": "EliminarBlancos",
-	"module":"tunit",
-	"params": { }
+    "task": "CSV2XLSX",
+	"description":"Convierte el fichero de CSV a XLSX",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+		]
   },
   {
-    "task": "CambiarPatron",
-	"module":"tunit",
-	"params": { 
-				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
-				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"}	
-			  }
-  },
+    "task": "XLSX2CSV",
+	"description":"Convierte el fichero de XLSX a CSV",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+		]
+	},
   {
-    "task": "ObtenerFilasNMasX",
-	"module":"tunit",
-	"params": { 
-				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
-				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}				
-			  }		
-  },
+    "task": "TXT2CSV",
+	"description":"Convierte el fichero de TXT a CSV",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
   {
-    "task": "BorrarFilasNMasX",
-	"module":"tunit",
-	"params": { 
-				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
-				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}			
-			  }		
-  },
+    "task": "CSV2TXT",
+	"description":"Convierte el fichero de CSV a TXT",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	}, 
   {
-    "task": "ObtenerFilaColumnaContiene",
-	"module":"tunit",
-	"params": { 
-				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
-				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
-				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}									
-			  }	
-  },
+    "task": "XLSX2TXT",
+	"description":"Convierte el fichero de XLSX a TXT",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
   {
-    "task": "BorrarFilaColumnaContiene",
-	"module":"tunit",
-	"params": { 
-				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
-				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
-				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}											
-			  }	
-  },
+    "task": "TXT2XLSX",
+	"description":"Convierte el fichero de TXT a XLSX",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
   {
-    "task": "ObtieneFilasPosiciones",
-	"module":"tunit",
-	"params": { 
-				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}		
-			  }	
-  },
+    "task": "TXT2JSON",
+	"description":"Convierte el fichero de TXT a JSON",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
   {
-    "task": "BorrarFilasPosiciones",
-	"module":"tunit",
-	"params": { 
-				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}		
-			  }	
-  },  
+    "task": "TXT2XML",
+	"description":"Convierte el fichero de TXT a XML",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+		]
+	},
   {
-    "task": "ObtieneColumnasPosiciones",
-	"module":"tunit",
-	"params": { 
-				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}	
-			  }	
-  },
+    "task": "CSV2JSON",
+	"description":"Convierte el fichero de CSV a JSON",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+		]
+	},
   {
-    "task": "BorrarColumnasPosiciones",
-	"module":"tunit",
-	"params": { 
-				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}			
-			  }	
-  },
+    "task": "CSV2XML",
+	"description":"Convierte el fichero de CSV a XML",
+	"params": { },
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+		]
+	},
   {
-    "task": "DividirColumnaPatron",
-  	"module":"tunit",
-  	"params": { 
-  			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
-  			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
-			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
-			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
-			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}
-			  					
-  		  }
-  },  
+    "task": "XLSX2JSON",
+	"description":"Convierte el fichero de XLSX a JSON",
+	"params": { },
+	"cmdOptions": [	]
+	},
+ 
   {
-    "task": "UnirColumnasPatron",
-  	"module":"tunit",
-  	"params": { 
-  			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
-  			"positionNewColumn":{"type":"Integer","index":true,"required":false,"description":"Posición en la que ubicaremos la nueva columna. Si no se indica se posicionará al final, si se indica las columnas siguientes se deplazarán una columna. "},
-			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
-			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
-			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}					
-  		  }
-  }  
+    "task": "XLSX2XML",
+	"description":"Convierte el fichero de XLSX a XML",
+	"params": { },
+	"cmdOptions": [	]
+	},
+	{
+	 	"task": "JSON2TXT",
+		"description":"Convierte el fichero de JSON a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			]
+	},
+	{
+	 	"task": "JSON2CSV",
+		"description":"Convierte el fichero de JSON a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},
+
+	 {
+	   "task": "JSON2XSLX",
+	"description":"Convierte el fichero de JSON a XLSX",
+	"params": { },
+	"cmdOptions": [	]
+	},
+	{
+	 	"task": "XML2TXT",
+		"description":"Convierte el fichero de XML a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},	
+	{
+	 	"task": "XML2CSV",
+		"description":"Convierte el fichero de XML a TXT",
+		"params": { },
+		"cmdOptions": 
+			[
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
+				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+			]
+	},
+	{
+	 "task": "XML2XLSX",
+	"description":"Convierte el fichero de XML a XLSX",
+	"params": { },
+	"cmdOptions": [	]
+	}
 ]

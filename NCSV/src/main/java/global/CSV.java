@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class CSV implements Callable<Integer> {
 	private String outputFile;
 	
 	/** Delimitador entre campos CSV */
-	@Option(names = { "-d", "--delimiter" }, description = "Delimitador CSV")
+	@Option(names = { "-dc", "--delimiter" }, description = "Delimitador CSV")
 	private String delimiter = ";";
 
 
@@ -60,6 +61,10 @@ public class CSV implements Callable<Integer> {
 	List<String> listTaskInCommand;
 
 
+	@Option(names = { "-c", "--charset" }, description = "Codificación (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
+	private String charsetName;
+	
+	
 	/**
 	 * Crea un objeto de opciones comunes basándose en los parámetros de la CLI.
 	 * 
@@ -94,7 +99,8 @@ public class CSV implements Callable<Integer> {
 		}
 		Reader in;
 		try {
-			in = new FileReader(path, StandardCharsets.UTF_8);
+			Charset cs = Charset.forName(this.charsetName);
+			in = new FileReader(path, cs);
 			return formato.parse(in);
 		} catch (IOException e) {
 			e.printStackTrace();

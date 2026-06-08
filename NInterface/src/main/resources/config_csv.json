@@ -3,6 +3,11 @@
     "task": "ObtenerRango",
 	"module":"tunit",
 	"description":"Obtiener un rango determinado del fichero",
+	"cmdOptions": 
+		[
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+		],
 	"params": { 
 		"range":{"type":"String","required":true,"description":"Rango a copiar"},
 		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},

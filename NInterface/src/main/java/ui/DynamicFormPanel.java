@@ -7,7 +7,6 @@ import global.task.ParamConfig;
 import global.task.TaskConfig;
 
 import java.awt.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,25 +107,6 @@ public class DynamicFormPanel extends JPanel {
 		}
 		
 	}
-	private JComboBox<String> createCharsetCombo()
-	{
-
-        // Arreglo con los nombres de los charsets nativos
-        String[] charsets = {
-            StandardCharsets.US_ASCII.name(),
-            StandardCharsets.ISO_8859_1.name(),
-            StandardCharsets.UTF_8.name(),
-            StandardCharsets.UTF_16BE.name(),
-            StandardCharsets.UTF_16LE.name(),
-            StandardCharsets.UTF_16.name()
-        };
-
-        JComboBox<String> combo = new JComboBox<>(charsets);
-        
-        // Seleccionar UTF-8 por defecto de forma segura
-        combo.setSelectedItem(StandardCharsets.UTF_8.name());
-        return combo;
-	}
 
 	private JComponent createComponentForType(String type, String description) {
 		switch (type) {
@@ -143,11 +123,12 @@ public class DynamicFormPanel extends JPanel {
 		case "ListString":
 			return new JTextField(20);
 		case "Charset":
-			return this.createCharsetCombo();
+			return CharsetCombo.createCharsetCombo(); 
 		default:
 			return new JTextField(20);
 		}
 	}
+
 
 	public boolean validateForm() {
 		boolean isValid = true;
