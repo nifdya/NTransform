@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -120,7 +119,7 @@ public class CSV implements Callable<Integer> {
 	        builder.setHeader().setSkipHeaderRecord(true);
 	    }
 	    
-	    return builder.build().parse(new FileReader(file, StandardCharsets.UTF_8));
+	    return builder.build().parse(new FileReader(file, Charset.forName(this.charsetName)));
 	}
 
 	/**
@@ -138,8 +137,15 @@ public class CSV implements Callable<Integer> {
 	public Integer call() {
 		try {
 	
+	        CSV.printModuleLogSpace(false, true);
+	        CSV.printModuleLog("🚀 Iniciando Tratamiento CSV -->", false);
+	        CSV.printModuleLog("📥 Fichero Inicial:" + this.inputFile, false);
+	        CSV.printModuleLog("📤 Fichero Final:  " + this.outputFile, false);
+	        CSV.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiter+"'", false);	        	
+	        CSV.printModuleLog("🔤 Charset:  " + this.charsetName, false);	    
+	        CSV.printModuleLogSpace(false, false);
+			
 			FileConfigTaskConfiguration fctc = new FileConfigTaskConfiguration();
-
 			// Archivo actual en la cadena de transformación
 			File currentInput = new File(this.inputFile);
 
@@ -148,12 +154,13 @@ public class CSV implements Callable<Integer> {
 				String iTask = this.listTaskInCommand.get(i);
 				String[] inputDataTask = iTask.split("\\|");
 				Task currentTask = Task.valueOf(inputDataTask[0]);
+		        CSV.printModuleLog("📌 Iniciando Tarea:  " + currentTask, false);
 
 				// Configuración de la tarea
 				String[] taskParams = Arrays.copyOfRange(inputDataTask, 1, inputDataTask.length);
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, taskParams);
 				TaskOptions optTask = optTaskConfig.getTaskOptions();
-
+				CSV.printModuleLog("🎛️ Parámetros:  " + taskParams, false);
 
 				// Determinar salida de este paso:
 				// Si es la última tarea, escribimos en el outputFile original.
@@ -169,7 +176,7 @@ public class CSV implements Callable<Integer> {
 				// --- EJECUCIÓN DE LA PASADA ---
 				// Cargamos el parser sobre el archivo que dejó la tarea anterior
 				try (CSVParser parser = loadCSVFromFile(currentInput);
-						BufferedWriter writer = new BufferedWriter(new FileWriter(nextOutput, StandardCharsets.UTF_8));
+						BufferedWriter writer = new BufferedWriter(new FileWriter(nextOutput, Charset.forName(this.charsetName)));
 						CSVPrinter printer = new CSVPrinter(writer, getFormatForPrinter(parser))) {
 					
 					ComunOptions opt = this.createOptionsObject(parser, printer);
@@ -178,6 +185,7 @@ public class CSV implements Callable<Integer> {
 						UnitaryTransformations ut = new UnitaryTransformations(currentTask, opt, optTask);
 						// El método doTask ahora debe procesar el parser y escribir en el printer
 						ut.doTask();
+   					 	CSV.printModuleLog("✅ Finalizada Tarea:  " + currentTask, false);
 						break;
 					default:
 						break;
@@ -190,12 +198,16 @@ public class CSV implements Callable<Integer> {
 				// El output de ahora será el input del siguiente paso
 				currentInput = nextOutput;
 			}
-
+	        CSV.printModuleLogSpace(false, true);
+	        CSV.printModuleLog("🚀 ¡Operación completada con éxito!", false);
+	        CSV.printModuleLogSpace(false, false);
 			return 0;
 
 		} catch (Exception e) {
-			System.err.println("Error en la cadena de CSV: " + e.getMessage());
+			CSV.printModuleLogSpace(true, false);
+			CSV.printModuleLog("❌ Error fatal en la cadena de CSV: " + e.getMessage(), true);
 			e.printStackTrace();
+			CSV.printModuleLogSpace(true, false);			
 			return 1;
 		}
 	}
@@ -204,6 +216,41 @@ public class CSV implements Callable<Integer> {
 		int exitCode = new CommandLine(new CSV()).execute(args);
 		System.exit(exitCode);
 
+	}
+	
+	
+	
+
+	/**
+	 * Prints structured module message output directly to the system console tracks.
+	 * 
+	 * @param message Target alphanumeric text to log.
+	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 */
+	public static void printModuleLog(String message, Boolean isError) {
+		if (isError) {
+			System.err.println("CSV - " + message);
+		} else {
+			System.out.println("CSV - " + message);
+		}
+	}
+
+	/**
+	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * 
+	 * @param isError    Switch flag mapping targeted output straight to error streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 */
+	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
+		String boundaryLayout = "====================================================================================================";
+		if (addLineBreak) {
+			boundaryLayout = "\n" + boundaryLayout;
+		}
+		if (isError) {
+			System.err.println(boundaryLayout);
+		} else {
+			System.out.println(boundaryLayout);
+		}
 	}
 
 }

@@ -118,8 +118,8 @@ public class TaskOptionsConfig {
 			// Convertimos el nodo a nuestra clase ConfigTask
 			this.configTask = this.fctc.getMapper().treeToValue(tareaNode, ConfigTask.class);
 
-			System.err.println("Tarea: " + this.configTask.getTask());
-			System.err.println("Parametros: " + this.configTask.getParams());
+//			System.err.println("Tarea: " + this.configTask.getTask());
+//			System.err.println("Parametros: " + this.configTask.getParams());
 
 			Map<String, Object> values = new HashMap<>();
 			//recorre los parámetros específicos de la tarea, los carga convertidos y si falta alguno obligatorio lanza una excepción.
@@ -128,7 +128,7 @@ public class TaskOptionsConfig {
 					String rawValue = this.commandParams.get(name);
 	
 					Object finalValue = convertType(rawValue, detail);
-					System.err.println("Valor convertido para " + name + ": " + finalValue.toString());
+					//System.err.println("Valor convertido para " + name + ": " + finalValue.toString());
 					values.put(name, finalValue);
 				} else if (detail.isRequired()) {
 					throw new RuntimeException("Falta el parámetro obligatorio: " + name);

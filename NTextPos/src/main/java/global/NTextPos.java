@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import global.options.ComunOptions;
 import global.options.TaskOptions;
@@ -46,46 +46,53 @@ public class NTextPos implements Callable<Integer> {
 	
 	private Map<String, RecordDefinition> mapaDefiniciones = new HashMap<>();
 
-	/**
-	 * Lee el archivo XML de forma nativa ignorando validaciones de red y extrae las
-	 * longitudes físicas de los campos.
-	 */
+	
+
+
 	private void initializeDefinitions() {
 	    try {
-	        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	        Document doc = dbf.newDocumentBuilder().parse(new File(this.defFile));
-	        NodeList records = doc.getElementsByTagName("record");
+	        // Instanciamos el mapeador de Jackson
+	        ObjectMapper mapper = new ObjectMapper();
+	        
+	        // Leemos el archivo JSON directamente a un árbol de nodos astuto
+	        JsonNode rootNode = mapper.readTree(new File(this.defFile));
+	        
+	        // Obtenemos la lista de "records" (equivalente a doc.getElementsByTagName("record"))
+	        JsonNode records = rootNode.path("definitions");
 
-	        for (int i = 0; i < records.getLength(); i++) {
-	            Element record = (Element) records.item(i);
+	        if (records.isArray()) {
+	            for (JsonNode record : records) {
+	                
+	                // Extraemos atributos/propiedades (si no existen, path() devuelve un nodo vacío seguro)
+	                String type = record.path("type").asText(null);
+	                int posType = record.path("posType").asInt(0);
+	                int lengthType = record.path("length").asInt(0);
 
-	            String type = record.getAttribute("type");
-	            String posTypeStr = record.getAttribute("posType");
-	            String lengthStr = record.getAttribute("length");
+	                // CLAVE ÚNICA: Conservamos tu lógica exacta de "default" si viene vacío
+	                String claveMap = (type != null && !type.isEmpty()) ? type : "default";
 
-	            // CLAVE ÚNICA: Si no viene tipo en el XML, usamos estrictamente "t1"
-	            String claveMap = (type != null && !type.isEmpty()) ? type : "default";
+	                // Instanciamos tu objeto de definición original sin tocar tu clase Java
+	                RecordDefinition def = new RecordDefinition(claveMap, posType, lengthType);
 
-	            int posType = posTypeStr.isEmpty() ? 0 : Integer.parseInt(posTypeStr);
-	            int lengthType = lengthStr.isEmpty() ? 0 : Integer.parseInt(lengthStr);
+	                // Procesamos el array interno de "fields"
+	                JsonNode fields = record.path("fields");
+	                if (fields.isArray()) {
+	                    for (JsonNode field : fields) {
+	                        int length = field.path("length").asInt();
+	                        boolean ignore = field.path("ignore").asBoolean(false);
+	                        
+	                        def.addField(length, ignore);
+	                    }
+	                }
 
-	            RecordDefinition def = new RecordDefinition(claveMap, posType, lengthType);
-
-	            NodeList fields = record.getElementsByTagName("field");
-	            for (int j = 0; j < fields.getLength(); j++) {
-	                Element field = (Element) fields.item(j);
-	                int length = Integer.parseInt(field.getAttribute("length"));
-	                boolean ignore = "true".equals(field.getAttribute("ignore"));
-	                def.addField(length, ignore);
+	                // Guardamos en tu mapa existente
+	                this.mapaDefiniciones.put(claveMap, def);
 	            }
-
-	            this.mapaDefiniciones.put(claveMap, def);
 	        }
 	    } catch (Exception e) {
-	        throw new RuntimeException("Error: " + e.getMessage(), e);
+	        throw new RuntimeException("Error cargando JSON: " + e.getMessage(), e);
 	    }
 	}
-
 
 	/**
 	 * Configura el objeto de opciones comunes inyectando flujos y metadatos.
@@ -128,13 +135,22 @@ public class NTextPos implements Callable<Integer> {
 	public Integer call() {
 		try {
 			if (this.listTaskInCommand == null || this.listTaskInCommand.isEmpty())
+			{				
 				return 1;
-
+			}
+			NTextPos.printModuleLogSpace(false, true);
+			NTextPos.printModuleLog("🚀 Iniciando Tratamiento Excel -->", false);
+			NTextPos.printModuleLog("📥 Fichero Inicial:" + this.inputFile, false);
+			NTextPos.printModuleLog("📥 Fichero de definiciones:" + this.defFile, false);
+			NTextPos.printModuleLog("🔤 Charset:  " + this.charsetName, false);	  			
+			NTextPos.printModuleLog("📤 Fichero Final:  " + this.outputFile, false);
+			NTextPos.printModuleLogSpace(false, false);
+			
 			// 1. Cargamos la estructura del archivo XML
 			this.initializeDefinitions();
 
 			File currentInput = new File(this.inputFile);
-
+			
 			// 2. Bucle secuencial de ejecución por pasadas temporales
 			for (int i = 0; i < this.listTaskInCommand.size(); i++) {
 				String iTask = this.listTaskInCommand.get(i);
@@ -145,7 +161,8 @@ public class NTextPos implements Callable<Integer> {
 				FileConfigTaskConfiguration fctc = new FileConfigTaskConfiguration();
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, taskParams);
 				TaskOptions optTask = optTaskConfig.getTaskOptions();
-
+				NTextPos.printModuleLog("📌 Iniciando Tarea:  " + currentTask, false);
+				NTextPos.printModuleLog("🎛️ Parámetros de la Tarea:  " + String.join(", ", inputDataTask), false);
 				File nextOutput;
 				if (i == this.listTaskInCommand.size() - 1) {
 					nextOutput = new File(this.outputFile);
@@ -171,12 +188,16 @@ public class NTextPos implements Callable<Integer> {
 
 				currentInput = nextOutput;
 			}
-
+			NTextPos.printModuleLogSpace(false, true);
+			NTextPos.printModuleLog("🚀 ¡Operación completada con éxito! Fichero generado correctamente en:" + this.outputFile, false);
+			NTextPos.printModuleLogSpace(false, false);	
 			return 0;
 
 		} catch (Exception e) {
-			System.err.println("Error en la cadena de procesamiento posicional: " + e.getMessage());
+			NTextPos.printModuleLogSpace(true, false);
+			NTextPos.printModuleLog("❌ Error fatal al general el nuevo fichero posicional: " + e.getMessage(), true);
 			e.printStackTrace();
+			NTextPos.printModuleLogSpace(true, false);				
 			return 1;
 		}
 	}
@@ -184,5 +205,36 @@ public class NTextPos implements Callable<Integer> {
 	public static void main(String[] args) {
 		int exitCode = new CommandLine(new NTextPos()).execute(args);
 		System.exit(exitCode);
+	}
+	/**
+	 * Prints structured module message output directly to the system console tracks.
+	 * 
+	 * @param message Target alphanumeric text to log.
+	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 */
+	public static void printModuleLog(String message, Boolean isError) {
+		if (isError) {
+			System.err.println("CONVT - " + message);
+		} else {
+			System.out.println("CONVT - " + message);
+		}
+	}
+
+	/**
+	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * 
+	 * @param isError    Switch flag mapping targeted output straight to error streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 */
+	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
+		String boundaryLayout = "====================================================================================================";
+		if (addLineBreak) {
+			boundaryLayout = "\n" + boundaryLayout;
+		}
+		if (isError) {
+			System.err.println(boundaryLayout);
+		} else {
+			System.out.println(boundaryLayout);
+		}
 	}
 }

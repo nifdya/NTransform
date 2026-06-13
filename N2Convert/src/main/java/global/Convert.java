@@ -12,39 +12,77 @@ import convert.*;
 import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
+/**
+ * Universal format transformation module.
+ * <p>
+ * This class implements a command-line interface (CLI) application using Picocli
+ * to orchestrate file conversions between multiple formats including JSON, XML,
+ * CSV, XLSX (Excel), and fixed-width positional text files (TXT).
+ * </p>
+ * 
+ * @author es.nesi
+ * @version 1.0
+ * @since 2026-06-13
+ */
 @Command(name = "convert", mixinStandardHelpOptions = true, version = "1.0", description = "Módulo completo de transformación universal de formatos.")
 public class Convert implements Callable<Integer> {
 
+	/**
+	 * Target input file to be processed.
+	 */
 	@Option(names = { "-i", "--input" }, required = true, description = "Ruta del archivo de entrada.")
 	private File inputFile;
 
+	/**
+	 * Output file destination where results will be stored.
+	 */
 	@Option(names = { "-o", "--output" }, required = true, description = "Ruta del archivo de salida.")
 	private File outputFile;
 
+	/**
+	 * Configuration file containing XML specifications for fixed-width positional files.
+	 */
 	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones XML de Ancho Fijo.")
 	private String defFile;
 
+	/**
+	 * Transformation task strategy to execute.
+	 */
 	@Option(names = { "-t", "--task" }, description = "Operación. Valores: ${COMPLETION-CANDIDATES}", required = true)
 	private Task task;
 
+	/**
+	 * Text encoding character set used during reading and writing operations.
+	 */
 	@Option(names = { "-c", "--charset" }, description = "Codificación (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
 	
+	/**
+	 * Character sequence used to separate structural values within CSV operations.
+	 */
 	@Option(names = { "-dc", "--delimiter" }, description = "Delimitador de elementos csv, por defercto ';'", defaultValue = ";")
 	private String delimiterCSV;
 
-	private void convertJson2X(String in, String out, Charset cs) throws IOException
+	/**
+	 * Routes JSON structures into concrete data outputs based on the assigned task strategy.
+	 * 
+	 * @param inputPathStr  Absolute path mapping the target input source.
+	 * @param outputPathStr Absolute path mapping the output destination.
+	 * @param charset       Character encoding framework applied to data writing streams.
+	 * @throws IOException If underlying converter fails to write or access file structures.
+	 */
+	private void convertJson2X(String inputPathStr, String outputPathStr, Charset charset) throws IOException
 	{
-		JsonToAllConverter jsonInverter = new JsonToAllConverter(cs);
+		JsonToAllConverter jsonInverter = new JsonToAllConverter(charset);
 		switch (task) {
 	    case JSON2TXT:
-	        jsonInverter.jsonToTxtPos(in, out, MapDefinitionsTextPos.getDefinitions(this.defFile));
+	        jsonInverter.jsonToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
 	        break;
 	    case JSON2CSV:
-	        jsonInverter.jsonToCsv(in, out); // Limpio de dependencias XML
+	        jsonInverter.jsonToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
 	        break;
 	    case JSON2XLSX:
-	        jsonInverter.jsonToExcel(in, out); // Limpio de dependencias XML
+	        jsonInverter.jsonToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
 	        break;
 
 		default:
@@ -52,23 +90,37 @@ public class Convert implements Callable<Integer> {
 		}
 		
 	}
-	private void convertXml2X(String in, String out, Charset cs) throws Exception
+	
+	/**
+	 * Routes XML structures into concrete data outputs based on the assigned task strategy.
+	 * 
+	 * @param inputPathStr  Absolute path mapping the target input source.
+	 * @param outputPathStr Absolute path mapping the output destination.
+	 * @param charset       Character encoding framework applied to data writing streams.
+	 * @throws Exception If XML processing node resolution yields parsing faults.
+	 */
+	private void convertXml2X(String inputPathStr, String outputPathStr, Charset charset) throws Exception
 	{
-		XmlToAllConverter xmlInverter = new XmlToAllConverter(cs);	
+		XmlToAllConverter xmlInverter = new XmlToAllConverter(charset);	
 		switch (task) {
 	    case XML2TXT:
-	        xmlInverter.xmlToTxtPos(in, out, MapDefinitionsTextPos.getDefinitions(this.defFile));
+	        xmlInverter.xmlToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
 	        break;
 	    case XML2CSV:
-	        xmlInverter.xmlToCsv(in, out); // Limpio de dependencias XML
+	        xmlInverter.xmlToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
 	        break;
 	    case XML2XLSX:
-	        xmlInverter.xmlToExcel(in, out); // Limpio de dependencias XML
+	        xmlInverter.xmlToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
 	        break;
 		}
 	}
 	
-	
+	/**
+	 * Execution core for the transformation logic. Intercepts CLI parameters,
+	 * prints module structural diagnostics, and routes format processing schemas.
+	 * 
+	 * @return {@code 0} upon successful translation pipeline termination, {@code 1} on file absence or processing failures.
+	 */
 	@Override
 	public Integer call() {
 		try {
@@ -86,6 +138,21 @@ public class Convert implements Callable<Integer> {
 			Map<String, RecordDefinitionTextPos> mapDefs = (this.defFile != null)
 					? MapDefinitionsTextPos.getDefinitions(this.defFile)
 					: null;
+	        Convert.printModuleLogSpace(false, true);
+	        Convert.printModuleLog("🚀 Iniciando Conversión -->", false);
+	        Convert.printModuleLog("📥 Fichero Inicial:" + in, false);
+	        Convert.printModuleLog("📤 Fichero Final:  " + out, false);
+	        Convert.printModuleLog("📌 Tarea:  " + task, false);
+	        if(this.delimiterCSV!=null)
+	        {
+	        	Convert.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiterCSV+"'", false);	        	
+	        }
+	        if(cs!=null)
+	        {
+	        	Convert.printModuleLog("🔤 Charset:  " + cs, false);	        	
+	        }
+	        Convert.printModuleLogSpace(false, false);
+			
 
 			switch (task) {
 			case XLS2XLSX:
@@ -98,10 +165,10 @@ public class Convert implements Callable<Integer> {
 				CsvExcelConverter.xlsxToCsv(in, out, cs);
 				break;
 			case TXT2CSV:
-				new TxtPosCsvConverter(mapDefs, cs).txtPosToCsv(in, out);
+				new TxtPosCsvConverter(mapDefs, cs, this.delimiterCSV).txtPosToCsv(in, out);
 				break;
 			case CSV2TXT:
-				new TxtPosCsvConverter(mapDefs, cs).csvToTxtPos(in, out);
+				new TxtPosCsvConverter(mapDefs, cs, this.delimiterCSV).csvToTxtPos(in, out);
 				break;
 			case TXT2XLSX:
 				new TxtPosExcelConverter(mapDefs, cs).txtPosToExcel(in, out);
@@ -141,20 +208,61 @@ public class Convert implements Callable<Integer> {
 		    	this.convertXml2X(in, out, cs);
 		        break;
 			}
+	        Convert.printModuleLogSpace(false, true);
+	        Convert.printModuleLog("🚀 ¡Operación completada con éxito!", false);
+	        Convert.printModuleLogSpace(false, false);
 
-			System.out.println("🚀 ¡Operación completada con éxito!");
 			return 0;
 
 		} catch (Exception e) {
-			System.err.println("❌ Error en la transformación: " + e.getMessage());
+			Convert.printModuleLogSpace(true, true);
+			Convert.printModuleLog("❌ Error en la transformación: " + e.getMessage(),false);
 			e.printStackTrace();
+			Convert.printModuleLogSpace(true, false);
 			return 1;
 		}
 	}
 
+	/**
+	 * Main application bootstrap mechanism. Dispatches parameter parsing to Picocli framework.
+	 * 
+	 * @param args Application terminal runtime arguments.
+	 */
 	public static void main(String[] args) {
 		CommandLine cmd = new CommandLine(new Convert());
 		cmd.setCaseInsensitiveEnumValuesAllowed(true);
 		System.exit(cmd.execute(args));
+	}
+	
+	/**
+	 * Prints structured module message output directly to the system console tracks.
+	 * 
+	 * @param message Target alphanumeric text to log.
+	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 */
+	public static void printModuleLog(String message, Boolean isError) {
+		if (isError) {
+			System.err.println("CONVT - " + message);
+		} else {
+			System.out.println("CONVT - " + message);
+		}
+	}
+
+	/**
+	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * 
+	 * @param isError    Switch flag mapping targeted output straight to error streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 */
+	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
+		String boundaryLayout = "====================================================================================================";
+		if (addLineBreak) {
+			boundaryLayout = "\n" + boundaryLayout;
+		}
+		if (isError) {
+			System.err.println(boundaryLayout);
+		} else {
+			System.out.println(boundaryLayout);
+		}
 	}
 }

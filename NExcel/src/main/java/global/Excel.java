@@ -103,8 +103,11 @@ public class Excel implements Callable<Integer> {
 	    try (FileInputStream fis = new FileInputStream(file)) {
 	        return new XSSFWorkbook(fis);
 	    } catch (Exception e) {
-	        System.err.println("Se produjo un error al cargar el fichero de origen: " + e.getMessage());
-	        return null;
+			Excel.printModuleLogSpace(true, false);
+			Excel.printModuleLog("❌ Error fatal al cargar el fichero de origen: " + e.getMessage(), true);
+			e.printStackTrace();
+			Excel.printModuleLogSpace(true, false);	
+			throw new IllegalStateException("Error al cargar el fichero: "+file.getAbsolutePath());
 	    }
 	} 
 
@@ -134,6 +137,12 @@ public class Excel implements Callable<Integer> {
 			opt.setOutputFile(fileOut);
 			XSSFWorkbook workbook = loadIputWorkbook(opt.getInputFile());
 
+	        Excel.printModuleLogSpace(false, true);
+	        Excel.printModuleLog("🚀 Iniciando Tratamiento Excel -->", false);
+	        Excel.printModuleLog("📥 Fichero Inicial:" + this.inputFile.getAbsolutePath(), false);
+	        Excel.printModuleLog("📤 Fichero Final:  " + this.outputFile.getAbsolutePath(), false);
+	        Excel.printModuleLogSpace(false, false);
+
 			// Procesar cada tarea solicitada por línea de comandos
 			for (String iTask : listTaskInCommand) {
 				//Obtenemos los parámetros de la tarea específica a ejecutar y la tarea
@@ -142,7 +151,8 @@ public class Excel implements Callable<Integer> {
 				inputDataTask = Arrays.copyOfRange(inputDataTask, 1, inputDataTask.length); //el primer parámetro es la tarea, ya no nos hace falta
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, inputDataTask); //cargamos los parámetros establecidos en el fichero de configuración y los combinamos con los establecidos en la línea de comandos
 				TaskOptions optTask = optTaskConfig.getTaskOptions(); //obtenemos los parametros de la tarea ya montados en el objeto.
-
+				Excel.printModuleLog("📌 Iniciando Tarea:  " + currentTask, false);
+				Excel.printModuleLog("🎛️ Parámetros de la Tarea:  " + String.join(", ", inputDataTask), false);
 				switch (optTask.getModule()) {
 				case "merge":
 					MergeSheets cmb = new MergeSheets(opt, optTask);
@@ -156,14 +166,20 @@ public class Excel implements Callable<Integer> {
 				default:
 					break;
 				}
+				Excel.printModuleLog("✅ Finalizada Tarea:  " + currentTask, false);
 			}
 			//Escribimos el fichero final, depués de haber procesado todas las tareas. 
 			workbook.write(out);
-			System.err.println("Excel generado correctamente en: " + (fileOut != null ? fileOut.getName() : "stdout"));
+	        Excel.printModuleLogSpace(false, true);
+	        Excel.printModuleLog("🚀 ¡Operación completada con éxito! Excel generado correctamente en:" +fileOut.getName(), false);
+	        Excel.printModuleLogSpace(false, false);			
 			return 0;
 
 		} catch (Exception e) {
-			System.err.println("Al general el Excel: " + e.getMessage());
+			Excel.printModuleLogSpace(true, false);
+			Excel.printModuleLog("❌ Error fatal al general el Excel: " + e.getMessage(), true);
+			e.printStackTrace();
+			Excel.printModuleLogSpace(true, false);	
 			return 1;
 		}
 	}
@@ -178,5 +194,36 @@ public class Excel implements Callable<Integer> {
 		System.exit(exitCode);
 
 	}
+	
+	/**
+	 * Prints structured module message output directly to the system console tracks.
+	 * 
+	 * @param message Target alphanumeric text to log.
+	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 */
+	public static void printModuleLog(String message, Boolean isError) {
+		if (isError) {
+			System.err.println("XSLX - " + message);
+		} else {
+			System.out.println("XSLX - " + message);
+		}
+	}
 
+	/**
+	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * 
+	 * @param isError    Switch flag mapping targeted output straight to error streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 */
+	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
+		String boundaryLayout = "====================================================================================================";
+		if (addLineBreak) {
+			boundaryLayout = "\n" + boundaryLayout;
+		}
+		if (isError) {
+			System.err.println(boundaryLayout);
+		} else {
+			System.out.println(boundaryLayout);
+		}
+	}
 }

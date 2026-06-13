@@ -1,53 +1,56 @@
 package record;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class MapDefinitionsTextPos {
 
     /**
-     * PROCESO CENTRALIZADO: Lee el XML de definiciones y construye el mapa indexado por tipos.
+     * PROCESO CENTRALIZADO: Lee el JSON de definiciones y construye el mapa indexado por tipos.
      * Hecho público para que cualquier módulo (Procesamiento o Conversión) pueda inicializar sus layouts.
      */
     public static Map<String, RecordDefinitionTextPos> getDefinitions(String defFile) {
         Map<String, RecordDefinitionTextPos> mapDefinitions = new HashMap<>();
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            Document doc = dbf.newDocumentBuilder().parse(new File(defFile));
-            NodeList records = doc.getElementsByTagName("record");
+            // Instanciamos el motor de Jackson para procesar el JSON
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(new File(defFile));
+            
+            // Accedemos a la lista raíz de definiciones (Array "definitions")
+            JsonNode records = rootNode.path("definitions");
 
-            for (int i = 0; i < records.getLength(); i++) {
-                Element record = (Element) records.item(i);
+            if (records.isArray()) {
+                for (JsonNode record : records) {
 
-                String type = record.getAttribute("type");
-                String posTypeStr = record.getAttribute("posType");
-                String lengthStr = record.getAttribute("length");
+                    // Extraemos propiedades de forma segura (con valores por defecto si no existen)
+                    String type = record.path("type").asText(null);
+                    int posType = record.path("posType").asInt(0);
+                    int lengthType = record.path("length").asInt(0);
 
-                // CLAVE ÚNICA: Si no viene tipo en el XML, usamos estrictamente "default"
-                String claveMap = (type != null && !type.isEmpty()) ? type : "default";
+                    // CLAVE ÚNICA: Si no viene tipo en el JSON, usamos estrictamente "default"
+                    String claveMap = (type != null && !type.isEmpty()) ? type : "default";
 
-                int posType = posTypeStr.isEmpty() ? 0 : Integer.parseInt(posTypeStr);
-                int lengthType = lengthStr.isEmpty() ? 0 : Integer.parseInt(lengthStr);
+                    RecordDefinitionTextPos def = new RecordDefinitionTextPos(claveMap, posType, lengthType);
 
-                RecordDefinitionTextPos def = new RecordDefinitionTextPos(claveMap, posType, lengthType);
+                    // Procesamos la lista interna de campos (Array "fields")
+                    JsonNode fields = record.path("fields");
+                    if (fields.isArray()) {
+                        for (JsonNode field : fields) {
+                            int length = field.path("length").asInt(0);
+                            boolean ignore = field.path("ignore").asBoolean(false);
+                            
+                            def.addField(length, ignore);
+                        }
+                    }
 
-                NodeList fields = record.getElementsByTagName("field");
-                for (int j = 0; j < fields.getLength(); j++) {
-                    Element field = (Element) fields.item(j);
-                    int length = Integer.parseInt(field.getAttribute("length"));
-                    boolean ignore = "true".equals(field.getAttribute("ignore"));
-                    def.addField(length, ignore);
+                    mapDefinitions.put(claveMap, def);
                 }
-
-                mapDefinitions.put(claveMap, def);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error cargando definiciones de ancho fijo: " + e.getMessage(), e);
+            throw new RuntimeException("Error cargando definiciones de ancho fijo desde JSON: " + e.getMessage(), e);
         }
         return mapDefinitions;
     }

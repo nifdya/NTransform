@@ -35,6 +35,11 @@
 	    <groupId>org.apache.commons</groupId>
 	    <artifactId>commons-csv</artifactId>
 	    <version>1.10.0</version>
-	</dependency>	
+	</dependency>
+<dependency>
+    <groupId>com.github.pjfanning</groupId>
+    <artifactId>excel-streaming-reader</artifactId>
+    <version>5.0.2</version> <!-- Versión moderna compatible con POI 5.x -->
+</dependency>		
 	</dependencies>    
 </project>

@@ -1,16 +1,15 @@
 package convert;
 
-
+import com.github.pjfanning.xlsx.StreamingReader; // <-- LECTOR EN STREAMING
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook; // <-- ESCRITOR EN STREAMING
 
 import java.io.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 public class CsvExcelConverter {
 
@@ -22,14 +21,16 @@ public class CsvExcelConverter {
             .build();
 
     /**
-     * PROCESO 1: CSV -> XLSX
-     * Lee un CSV de forma segura (soportando saltos de línea o comillas internas)
+     * PROCESO 1: CSV -> XLSX (OPTIMIZADO PARA MEMORIA)
+     * Lee un CSV línea a línea y escribe el Excel volcando datos al disco de forma constante.
      */
     public static void csvToXlsx(String csvPath, String xlsxPath, Charset charset) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, charset));
              CSVParser csvParser = new CSVParser(reader, EXCEL_CSV_FORMAT);
-             Workbook workbook = new XSSFWorkbook()) {
+             // Mantener solo 100 filas en memoria RAM simultáneamente
+             SXSSFWorkbook workbook = new SXSSFWorkbook(100)) {
 
+            workbook.setCompressTempFiles(true);
             Sheet sheet = workbook.createSheet("Datos");
             int rowNum = 0;
 
@@ -50,19 +51,21 @@ public class CsvExcelConverter {
     }
 
     /**
-     * PROCESO INVERSO: XLSX -> CSV
-     * Lee un Excel y genera un CSV escapando caracteres de forma automática
+     * PROCESO INVERSO: XLSX -> CSV (OPTIMIZADO PARA MEMORIA)
+     * Lee un Excel masivo directamente del disco y genera el archivo CSV sobre la marcha.
      */
     public static void xlsxToCsv(String xlsxPath, String csvPath, Charset charset) throws IOException {
-        // DataFormatter es clave: lee las celdas tal y como se ven en Excel
         DataFormatter dataFormatter = new DataFormatter();
 
         try (InputStream fileIn = new FileInputStream(xlsxPath);
-             Workbook workbook = WorkbookFactory.create(fileIn);
+             // Abre el archivo usando la arquitectura de streaming SAX por debajo
+             Workbook workbook = StreamingReader.builder()
+                     .rowCacheSize(100)    // Filas simultáneas en RAM
+                     .bufferSize(4096)     // Buffer de lectura
+                     .open(fileIn);
              BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, charset));
              CSVPrinter csvPrinter = new CSVPrinter(writer, EXCEL_CSV_FORMAT)) {
 
-            // Procesamos la primera hoja
             Sheet sheet = workbook.getSheetAt(0);
 
             for (Row row : sheet) {
@@ -71,7 +74,8 @@ public class CsvExcelConverter {
                 String[] lineData = new String[lastColumn];
 
                 for (int cn = 0; cn < lastColumn; cn++) {
-                    Cell cell = row.getCell(cn, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+                    // En StreamingReader el comportamiento por defecto devuelve null si la celda no tiene datos
+                    Cell cell = row.getCell(cn);
                     if (cell == null) {
                         lineData[cn] = "";
                     } else {
@@ -79,7 +83,7 @@ public class CsvExcelConverter {
                         lineData[cn] = dataFormatter.formatCellValue(cell);
                     }
                 }
-                // Escribe la línea escapando comillas o delimitadores automáticamente si es necesario
+                // Escribe la línea escapando comillas o delimitadores automáticamente
                 csvPrinter.printRecord((Object[]) lineData);
             }
             csvPrinter.flush();

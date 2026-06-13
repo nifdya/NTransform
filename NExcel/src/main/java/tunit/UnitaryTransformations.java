@@ -277,7 +277,7 @@ public class UnitaryTransformations extends MasterOperation {
 					String process = this.checkSheetAction(i, nombreDeLaHoja);
 					if (process.equals("Check") || process.equals("Copy")) {
 						Sheet outSheet = fOut.createSheet(nombreDeLaHoja);
-						System.err.println("Procesando la hoja: " + nombreDeLaHoja);
+						//System.err.println("Procesando la hoja: " + nombreDeLaHoja);
 
 						// trabajamos cada fila
 						for (Row oldRow : hojaOrigen) {

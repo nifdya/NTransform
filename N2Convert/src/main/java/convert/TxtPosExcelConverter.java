@@ -1,12 +1,13 @@
 package convert;
 
+import com.github.pjfanning.xlsx.StreamingReader; // <-- LECTOR EN STREAMING DE GRANDES EXCEL
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
-import record.MapDefinitionsTextPos; // Importamos el resolvedor centralizado
+import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
 public class TxtPosExcelConverter {
@@ -20,12 +21,13 @@ public class TxtPosExcelConverter {
     }
 
     /**
-     * PROCESO 3: TEXTO POSICIONAL -> EXCEL (.XLSX)
+     * PROCESO 3: TEXTO POSICIONAL -> EXCEL (.XLSX) OPTIMIZADO PARA GRANDES VOLÚMENES
      */
     public void txtPosToExcel(String txtPath, String xlsxPath) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
-             Workbook workbook = new XSSFWorkbook()) {
+             SXSSFWorkbook workbook = new SXSSFWorkbook(100)) { 
 
+            workbook.setCompressTempFiles(true);
             Sheet sheet = workbook.createSheet("Datos Posicionales");
             int rowNum = 0;
             String line;
@@ -33,7 +35,6 @@ public class TxtPosExcelConverter {
             while ((line = reader.readLine()) != null) {
                 if (line.isEmpty()) continue;
 
-                // REUTILIZACIÓN GLOBAL: Invocamos de forma estática la lógica centralizada de tipado
                 String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
                 RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
                 if (def == null) continue;
@@ -58,32 +59,40 @@ public class TxtPosExcelConverter {
                 }
             }
 
-            // Auto-ajustar columnas basándonos en la primera fila de datos generada
-            if (sheet.getRow(0) != null) {
-                for (int col = 0; col < sheet.getRow(0).getLastCellNum(); col++) {
-                    sheet.autoSizeColumn(col);
+            if (sheet instanceof org.apache.poi.xssf.streaming.SXSSFSheet) {
+                org.apache.poi.xssf.streaming.SXSSFSheet sxSheet = (org.apache.poi.xssf.streaming.SXSSFSheet) sheet;
+                if (sxSheet.getRow(0) != null) {
+                    for (int col = 0; col < sxSheet.getRow(0).getLastCellNum(); col++) {
+                        sxSheet.trackColumnForAutoSizing(col);
+                        sxSheet.autoSizeColumn(col);
+                    }
                 }
             }
 
             try (FileOutputStream fileOut = new FileOutputStream(xlsxPath)) {
                 workbook.write(fileOut);
             }
+            // Eliminado workbook.dispose() por estar deprecated (el try-with-resources se encarga)
         }
     }
 
     /**
-     * PROCESO 4: EXCEL (.XLSX) -> TEXTO POSICIONAL
+     * PROCESO 4: EXCEL (.XLSX) -> TEXTO POSICIONAL OPTIMIZADO CONTRA ERRORES DE MEMORIA
      */
     public void excelToTxtPos(String xlsxPath, String txtPath) throws IOException {
+        // Abrimos el archivo a través de StreamingReader
         try (InputStream fileIn = new FileInputStream(xlsxPath);
-             Workbook workbook = new XSSFWorkbook(fileIn);
+             Workbook workbook = StreamingReader.builder()
+                     .rowCacheSize(100)    // Número de filas a mantener en memoria RAM simultáneamente
+                     .bufferSize(4096)     // Tamaño del buffer de lectura del archivo físico
+                     .open(fileIn);        // Abre el flujo en modo SAX/Streaming
              BufferedWriter writer = new BufferedWriter(new FileWriter(txtPath, charset))) {
 
-            Sheet sheet = workbook.getSheetAt(0); // Procesa la primera pestaña
-            DataFormatter formatter = new DataFormatter(); // Garantiza leer el texto tal y como se ve en Excel
+            Sheet sheet = workbook.getSheetAt(0); 
+            DataFormatter formatter = new DataFormatter(); 
 
+            // El bucle interno itera fila por fila a medida que se parsea el XML del disco
             for (Row row : sheet) {
-                // Averiguar el tipo leyendo la primera celda (Celda indice 0)
                 String tipoExcel = "default";
                 Cell firstCell = row.getCell(0);
                 if (firstCell != null && this.mapaDefiniciones.size() > 1) {
@@ -96,7 +105,7 @@ public class TxtPosExcelConverter {
                 RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipoExcel);
                 if (def == null) continue;
 
-                List<Integer> longitudes = def.getLengthType() > 0 ? def.getLongitudes() : def.getLongitudes();
+                List<Integer> longitudes = def.getLongitudes();
                 List<Boolean> ignorados = def.getIgnorados();
                 StringBuilder sbLine = new StringBuilder();
                 int excelCellIdx = 0;

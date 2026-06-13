@@ -5,31 +5,35 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CoordExecutor {
+	
 
     public void executePipeline(ComunOptions config) {
         List<Command> commands = config.commands;
         if (commands == null || commands.isEmpty()) {
-            System.out.println("⚠ No hay instrucciones para ejecutar.");
+            Coordinator.printModuleLog("⚠ No hay instrucciones para ejecutar.", false);
             return;
         }
 
         // El origen arranca con el fichero inicial global
         String orgCurrentFile = config.inputFile;
+        Coordinator.printModuleLogSpace(false, true);
+        Coordinator.printModuleLog("🚀 Iniciando Coordinador General", false);
+        Coordinator.printModuleLog("📥 Fichero Inicial:" + config.inputFile, false);
+        Coordinator.printModuleLog("📤 Fichero Final:  " + config.outputFile, false);
+        Coordinator.printModuleLogSpace(false, false);
 
-        System.out.println("🚀 Iniciando Pipeline Complejo...");
-        System.out.println("📥 Fichero Inicial: " + config.inputFile);
-        System.out.println("📤 Fichero Final:   " + config.outputFile);
-
+        
         for (int i = 0; i < commands.size(); i++) {
             Command block = commands.get(i);
      
-            
-            System.out.println("\n==================================================");
-            System.out.println("📦 INSTRUCCIÓN PASO " + block.step + " | Ejecutable: " + block.jar);
-            System.out.println("==================================================");
+            Coordinator.printModuleLogSpace(false, true);
+            Coordinator.printModuleLog("ℹ️ INSTRUCCIÓN PASO "+ block.step + " | Ejecutable: " + block.jar, false);
+            Coordinator.printModuleLogSpace(false, false);
+
 
             String subTaskStr="";
             String subTaskStrCMD="";
@@ -37,11 +41,12 @@ public class CoordExecutor {
             String destCurrentFile;            
             
             if (block.tasks == null || block.tasks.isEmpty()) {
-                System.out.println("⚠ Este bloque no contiene tareas internas. Saltando...");
+            	Coordinator.printModuleLog("⚠ Este comando no contiene subtareas.", false);
                 continue;
             }
             else
-            {           	
+            {         
+            	Coordinator.printModuleLog("ℹ️ Procesando subtareas.", false);
             	for (SubTarea subTask : block.tasks) {
             		subTaskStr += " " + subTask.toString();
             		subTaskStrCMD += " " + subTask.toString();
@@ -49,20 +54,26 @@ public class CoordExecutor {
             }
 
             try {
-            	System.out.println("Ficheros intermedios:  " + config.tempFile);
-            	System.out.println("Paso:  " +  block.step);
-            	System.out.println("Replace:  " +  config.tempFile.replace("[[PASO]]", block.step)); 
-            	destCurrentFile = isLastCommand ? config.outputFile : config.tempFile.replace("[[PASO]]", block.step);
+            	Coordinator.printModuleLog("Ficheros intermedios:  " + config.tempFile, false);
+            	Coordinator.printModuleLog("Paso:  " +  block.step, false);
+            	Coordinator.printModuleLog("Fichero temporal: "+  config.tempFile.replace("[[PASO]]", block.step), false);
 
-                System.out.println("\n  🔹 Ejecutando Instrucción [" + (i + 1) + "/" + subTaskStr+ "]: " +  subTaskStrCMD);
-                System.out.println("     📥 Entrada: " + orgCurrentFile + " (" + (orgCurrentFile.length() / 1024) + " KB)");
-                System.out.println("     📤 Salida:  " + destCurrentFile);
+            	destCurrentFile = isLastCommand ? config.outputFile : config.tempFile.replace("[[PASO]]", block.step);
+            	
+            	
+            	Coordinator.printModuleLog("   🔹 Ejecutando Instrucción ["  + (i + 1) + "/" + subTaskStr+ "]: " +  subTaskStrCMD, false);
+            	Coordinator.printModuleLog("      📥 Entrada: " + orgCurrentFile + " (" + (orgCurrentFile.length() / 1024) + " KB)", false);
+            	Coordinator.printModuleLog("      📤 Salida:  " +  destCurrentFile, false);
+
+        
 
                 // Ejecutar el comando JAR correspondiente a esta instrucción
                 boolean ok = executeCommand(block, orgCurrentFile, destCurrentFile);
 
                 if (!ok) {
-                    System.err.println("❌ Fallo en la subtarea: " + block.step + ". Pipeline abortado.");
+                	Coordinator.printModuleLogSpace(true, true);
+                    Coordinator.printModuleLog("❌ Fallo en la subtarea: " + block.step + ". Pipeline abortado.", true);
+                    Coordinator.printModuleLogSpace(true, false);
                     return;
                 }
 
@@ -73,7 +84,9 @@ public class CoordExecutor {
                  orgCurrentFile = destCurrentFile;
 
             } catch (Exception e) {
-                System.err.println("❌ Error crítico de infraestructura en " + block.step + ": " + e.getMessage());
+            	Coordinator.printModuleLogSpace(true, true);
+                Coordinator.printModuleLog("❌ Error crítico de infraestructura en " + block.step + ": " + e.getMessage(), true);
+                Coordinator.printModuleLogSpace(true, false);
                 return;
             }      
             
@@ -81,15 +94,17 @@ public class CoordExecutor {
             // Validar estrictamente la existencia del archivo de entrada en disco
             File archivoEntrada = new File(orgCurrentFile);
             if (!archivoEntrada.exists()) {
-                System.err.println("\n❌ ERROR: El archivo de entrada no existe: " + archivoEntrada.getAbsolutePath());
-               // System.err.println("Abortando el pipeline en: " + nombreLog);
+            	Coordinator.printModuleLogSpace(true, true);
+                Coordinator.printModuleLog("❌ ERROR: El archivo de entrada no existe: " + archivoEntrada.getAbsolutePath(),true);
+                Coordinator.printModuleLogSpace(true, false);
                 return;
             }            
         }
 
 
-
-        System.out.println("\n🎉 ¡Proceso finalizado por completo! Fichero final generado exitosamente.");
+        Coordinator.printModuleLogSpace(false, true);
+        System.out.println("🎉 ¡Proceso finalizado por completo! Fichero final generado exitosamente.");
+        Coordinator.printModuleLogSpace(false, false);
     }
 
     private boolean executeCommand(Command cmd, String origen, String destino) {
@@ -110,9 +125,10 @@ public class CoordExecutor {
             command.add(fileDestino.getAbsolutePath());
             
             // Incluimos las opciones de la instrucción
-            if(!cmd.cmdOptions.isEmpty())
+            if(cmd.cmdOptions!=null && !cmd.cmdOptions.isEmpty())
             {
-            	command.add(cmd.cmdOptions);
+//            	command.add(cmd.cmdOptions);
+            	command.addAll(Arrays.asList(cmd.cmdOptions.split("\\s+")));            	
             }
 
             // 2. Agregar cada subtarea con su propio prefijo "-t"
@@ -124,11 +140,13 @@ public class CoordExecutor {
 
             // 3. Construir el ProcessBuilder con la lista dinámica
             ProcessBuilder pb = new ProcessBuilder(command);
-
-
+            // CRITICAL: Inherit IO shifts sub-process outputs straight to the coordinator's streams.
+            // This completely avoids buffer clogs and lets NLog capture everything seamlessly.
+            pb.inheritIO();
+            
             // 3. Forzar el directorio de ejecución en la carpeta donde vive el JAR
             pb.directory(fileJar.getParentFile());
-            System.out.println("      🛠 [COMANDO REAL]: " + String.join(" ", pb.command()));
+         	Coordinator.printModuleLog("      🛠 [COMANDO REAL]: " + String.join(" ", pb.command()), false);
             
             pb.redirectErrorStream(true);
             Process process = pb.start();
@@ -137,16 +155,24 @@ public class CoordExecutor {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println("      [" + cmd.step + "] " + line);
+                 	Coordinator.printModuleLog("       [" + cmd.step + "] " + line, false); 
                 }
             }
 
             int exitCode = process.waitFor();
-            System.out.println("     🏁 [" + cmd.step + "] Finalizado con código: " + exitCode);
+            Coordinator.printModuleLog("      💾 [" + cmd.step + "] Finalizado con código: " + exitCode, false);
+            if(exitCode!=0)
+            {
+
+    			Coordinator.printModuleLogSpace(true, true);
+    			Coordinator.printModuleLog("❌ Error al ejecutar el comando. exitCode=" + exitCode, true);
+    			Coordinator.printModuleLogSpace(true, false);	
+    			//throw new IllegalStateException("Error al ejecutar el comando. exitCode=" + exitCode);
+            }
             return exitCode == 0;
 
         } catch (Exception e) {
-            System.err.println("❌ Error al invocar ProcessBuilder para " + cmd.step + ": " + e.getMessage());
+        	Coordinator.printModuleLog("❌ Error al invocar ProcessBuilder para " + cmd.step + ": " + e.getMessage(), true);
             return false;
         }
     }

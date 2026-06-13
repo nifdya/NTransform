@@ -1,24 +1,34 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>es.nesi</groupId>
-  <artifactId>NCoord</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-    <dependencies>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>es.nesi</groupId>
+	<artifactId>NCoord</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<dependencies>
 
 
-    <!-- Jackson Databind: La librería principal para convertir JSON a Objetos -->
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>2.17.0</version>
-    </dependency>
-    
-    <!-- Picocli: Para la interfaz de línea de comandos -->
-    <dependency>
-        <groupId>info.picocli</groupId>
-        <artifactId>picocli</artifactId>
-        <version>4.7.5</version>
-    </dependency>
+		<!-- Jackson Databind: La librería principal para convertir JSON a
+		Objetos -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.17.0</version>
+		</dependency>
 
-	</dependencies>  
+		<!-- Picocli: Para la interfaz de línea de comandos -->
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.7.5</version>
+		</dependency>
+
+		<!-- Dependencia al proyecto de logs-->
+		<dependency>
+			<groupId>es.nesi</groupId>
+			<artifactId>NLog</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+	</dependencies>
 </project>
