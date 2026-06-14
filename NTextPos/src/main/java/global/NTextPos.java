@@ -16,6 +16,7 @@ import java.util.concurrent.Callable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import es.nesi.NLog;
 import global.options.ComunOptions;
 import global.options.TaskOptions;
 import global.options.TaskOptionsConfig;
@@ -35,7 +36,7 @@ public class NTextPos implements Callable<Integer> {
 	@Option(names = { "-o", "--output" }, description = "Archivo de salida")
 	private String outputFile;
 
-	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones XML")
+	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones en formato JSON")
 	private String defFile;
 
 	@Option(names = { "-t", "--task" }, description = "Tarea y su configuración")
@@ -43,6 +44,11 @@ public class NTextPos implements Callable<Integer> {
 
 	@Option(names = { "-c", "--charset" }, description = "Codificación de caracteres (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
+	/**
+	 * 
+	 */
+	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "log")
+	private String trace;	
 	
 	private Map<String, RecordDefinition> mapaDefiniciones = new HashMap<>();
 
@@ -134,12 +140,16 @@ public class NTextPos implements Callable<Integer> {
 	@Override
 	public Integer call() {
 		try {
+			if(this.trace!=null && this.trace!="")
+			{
+				NLog.activate(trace);
+			}
 			if (this.listTaskInCommand == null || this.listTaskInCommand.isEmpty())
 			{				
 				return 1;
 			}
 			NTextPos.printModuleLogSpace(false, true);
-			NTextPos.printModuleLog("🚀 Iniciando Tratamiento Excel -->", false);
+			NTextPos.printModuleLog("🚀 Iniciando Tratamiento del fichero de texto por posiciones -->", false);
 			NTextPos.printModuleLog("📥 Fichero Inicial:" + this.inputFile, false);
 			NTextPos.printModuleLog("📥 Fichero de definiciones:" + this.defFile, false);
 			NTextPos.printModuleLog("🔤 Charset:  " + this.charsetName, false);	  			
@@ -214,9 +224,9 @@ public class NTextPos implements Callable<Integer> {
 	 */
 	public static void printModuleLog(String message, Boolean isError) {
 		if (isError) {
-			System.err.println("CONVT - " + message);
+			System.err.println("TEXTP - " + message);
 		} else {
-			System.out.println("CONVT - " + message);
+			System.out.println("TEXTP - " + message);
 		}
 	}
 

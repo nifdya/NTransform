@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import global.UtilsFileSystem;
 import global.task.TaskConfig;
 
 public class MainFrame extends JFrame {
@@ -43,7 +45,7 @@ public class MainFrame extends JFrame {
 	private JPanel centerContainer;
 
 	// Listado de tus 6 archivos de configuración JSON
-	private final String[] jsonFiles = { "config_convert.json", "config_csv.json", "config_excel.json",
+	private String[] jsonFiles = { "config_convert.json", "config_csv.json", "config_xlsx.json",
 			"config_text.json" };
 
 	private String getNodeJarForJsonFile(String jsonFile) {
@@ -52,8 +54,8 @@ public class MainFrame extends JFrame {
 		case "config_csv.json":
 			node = "NCSV.jar";
 			break;
-		case "config_excel.json":
-			node = "NExcel.jar";
+		case "config_xlsx.json":
+			node = "NXLSX.jar";
 			break;
 		case "config_convert.json":
 			node = "N2Convert.jar";
@@ -65,7 +67,8 @@ public class MainFrame extends JFrame {
 		return node;
 	}
 
-	public MainFrame() {
+	public MainFrame() throws IOException {
+		
 		setTitle("Constructor de Pipelines Multi-JSON NExcel");
 		setSize(1000, 750);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -201,15 +204,18 @@ public class MainFrame extends JFrame {
 		add(mainSplit, BorderLayout.CENTER);
 	}
 
-	private void initComponents() {
+	private void initComponents() throws IOException {
+		//1 - Comprobamos que los ficheros de configuración están en los recursos y quitamos los recursos que no se encuenn
+		//    disponibles en el directorio
+		this.jsonFiles=UtilsFileSystem.getJsonFilesInResources(UtilsFileSystem.getResourcesPath(), this.jsonFiles);
+		
 		setLayout(new BorderLayout(10, 10));
 
 		this.initTopContainer();
 		this.initJarPanel();
 		this.initTaskPanel();
 
-		// CORRECCIÓN: Ejecuta la carga inicial automática del primer JSON al arrancar
-		// el panel
+
 		if (configSelector.getItemCount() > 0) {
 			String firstFile = (String) configSelector.getItemAt(0);
 			loadJsonConfiguration(firstFile);

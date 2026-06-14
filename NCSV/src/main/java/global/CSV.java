@@ -15,6 +15,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 
+import es.nesi.NLog;
 import global.options.ComunOptions;
 import global.options.TaskOptions;
 import global.options.TaskOptionsConfig;
@@ -62,6 +63,13 @@ public class CSV implements Callable<Integer> {
 
 	@Option(names = { "-c", "--charset" }, description = "Codificación (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
+	
+	
+	/**
+	 * 
+	 */
+	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "")
+	private String trace;	
 	
 	
 	/**
@@ -136,14 +144,19 @@ public class CSV implements Callable<Integer> {
 	@Override
 	public Integer call() {
 		try {
-	
+
+			if(this.trace!=null && this.trace!="")
+			{
+				NLog.activate(trace);
+			}
 	        CSV.printModuleLogSpace(false, true);
 	        CSV.printModuleLog("🚀 Iniciando Tratamiento CSV -->", false);
-	        CSV.printModuleLog("📥 Fichero Inicial:" + this.inputFile, false);
-	        CSV.printModuleLog("📤 Fichero Final:  " + this.outputFile, false);
+	        CSV.printModuleLog("📥 Fichero Inicial: " + this.inputFile, false);
+	        CSV.printModuleLog("📤 Fichero Final: " + this.outputFile, false);
 	        CSV.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiter+"'", false);	        	
 	        CSV.printModuleLog("🔤 Charset:  " + this.charsetName, false);	    
 	        CSV.printModuleLogSpace(false, false);
+
 			
 			FileConfigTaskConfiguration fctc = new FileConfigTaskConfiguration();
 			// Archivo actual en la cadena de transformación
@@ -160,7 +173,7 @@ public class CSV implements Callable<Integer> {
 				String[] taskParams = Arrays.copyOfRange(inputDataTask, 1, inputDataTask.length);
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, taskParams);
 				TaskOptions optTask = optTaskConfig.getTaskOptions();
-				CSV.printModuleLog("🎛️ Parámetros:  " + taskParams, false);
+				CSV.printModuleLog("🎛️ Parámetros de la Tarea:  " + String.join(", ", inputDataTask), false);
 
 				// Determinar salida de este paso:
 				// Si es la última tarea, escribimos en el outputFile original.

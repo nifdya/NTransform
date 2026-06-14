@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.nesi</groupId>
   <artifactId>N2Convert</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
 <dependencies>
     <!-- Core de Apache POI para archivos .xls -->
     <dependency>
@@ -41,5 +41,10 @@
     <artifactId>excel-streaming-reader</artifactId>
     <version>5.0.2</version> <!-- Versión moderna compatible con POI 5.x -->
 </dependency>		
-	</dependencies>    
+	<dependency>
+		<groupId>es.nesi</groupId>
+		<artifactId>NLog</artifactId>
+		<version>1.0.0</version>
+	</dependency>
+</dependencies>    
 </project>

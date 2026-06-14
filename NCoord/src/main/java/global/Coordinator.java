@@ -33,7 +33,7 @@ public class Coordinator {
 	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
 	 */
 	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
-		String boundaryLayout = "==================================================";
+		String boundaryLayout = "====================================================================================================";
 		if (addLineBreak) {
 			boundaryLayout = "\n" + boundaryLayout;
 		}

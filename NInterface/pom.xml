@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.nesi</groupId>
   <artifactId>NInterface</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <properties>
     <!-- Configura aquí tu versión de Java (ej. 17 o 21) -->
     <maven.compiler.source>17</maven.compiler.source>
@@ -11,18 +11,7 @@
   </properties>
 
   <dependencies>
- 	<!-- Jackson Core: Funcionalidades básicas de streaming -->
-	<dependency>
-	        <groupId>com.fasterxml.jackson.core</groupId>
-	        <artifactId>jackson-core</artifactId>
-	        <version>2.17.2</version>
-	    </dependency>
-	    <!-- Jackson Annotations: Para mapear propiedades si fuera necesario -->
-	    <dependency>
-	        <groupId>com.fasterxml.jackson.core</groupId>
-	        <artifactId>jackson-annotations</artifactId>
-	        <version>2.17.2</version>
-	    </dependency>
+
 	    <!-- Jackson Databind: El ObjectMapper para convertir JSON a Objetos -->
 	    <dependency>
 	        <groupId>com.fasterxml.jackson.core</groupId>

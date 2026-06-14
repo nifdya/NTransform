@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>es.nesi</groupId>
   <artifactId>Excel</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <dependencies>
     <!-- Core de Apache POI para archivos .xls -->
     <dependency>
@@ -31,10 +31,9 @@
         <version>4.7.5</version>
     </dependency>
 	 <dependency>
-	    <groupId>org.junit.jupiter</groupId>
-	    <artifactId>junit-jupiter-api</artifactId>
-	    <version>5.10.0</version>
-	    <scope>test</scope>
-	</dependency>   
-	</dependencies>  
+	 	<groupId>es.nesi</groupId>
+	 	<artifactId>NLog</artifactId>
+	 	<version>1.0.0</version>
+	 </dependency>
+  </dependencies>  
 </project>

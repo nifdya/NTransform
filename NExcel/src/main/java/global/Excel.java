@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import es.nesi.NLog;
 import global.options.ComunOptions;
 import global.options.TaskOptions;
 import global.options.TaskOptionsConfig;
@@ -59,7 +60,13 @@ public class Excel implements Callable<Integer> {
 	// Acepta parámetros estilo: -T limpiar:columna=A -T formatear:columna=B
 	@Option(names = { "-t", "--task" }, description = "Tarea y su configuración (tarea:param=valor;param2=valor2)")
 	List<String> listTaskInCommand;
-
+	
+	/**
+	 * 
+	 */
+	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "")
+	private String trace;
+	
 	/**
 	 * Crea un objeto de opciones comunes basándose en los parámetros de la CLI.
 	 * 
@@ -126,6 +133,11 @@ public class Excel implements Callable<Integer> {
 		// 2. Iniciamos el proceso
 		try (InputStream in = new FileInputStream(fileIn); OutputStream out = new FileOutputStream(fileOut)) {
 
+			if(this.trace!=null && this.trace!="")
+			{
+				NLog.activate(trace);
+			}
+			
 			// Creamos las opciones estableciendo los parámetros insertados
 			ComunOptions opt = this.createOptionsObject();
 

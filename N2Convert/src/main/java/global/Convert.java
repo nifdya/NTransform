@@ -9,6 +9,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import convert.*;
+import es.nesi.NLog;
 import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
@@ -42,7 +43,7 @@ public class Convert implements Callable<Integer> {
 	/**
 	 * Configuration file containing XML specifications for fixed-width positional files.
 	 */
-	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones XML de Ancho Fijo.")
+	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones JSON para el procesamiento de los ficheros de tipo de Ancho Fijo.")
 	private String defFile;
 
 	/**
@@ -60,8 +61,14 @@ public class Convert implements Callable<Integer> {
 	/**
 	 * Character sequence used to separate structural values within CSV operations.
 	 */
-	@Option(names = { "-dc", "--delimiter" }, description = "Delimitador de elementos csv, por defercto ';'", defaultValue = ";")
+	@Option(names = { "-dc", "--delimiter" }, description = "Delimitador de elementos csv, por defecto ';'", defaultValue = ";")
 	private String delimiterCSV;
+	
+	/**
+	 * 
+	 */
+	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "")
+	private String trace;
 
 	/**
 	 * Routes JSON structures into concrete data outputs based on the assigned task strategy.
@@ -124,6 +131,10 @@ public class Convert implements Callable<Integer> {
 	@Override
 	public Integer call() {
 		try {
+			if(this.trace!=null && this.trace!="")
+			{
+				NLog.activate(trace);
+			}
 			if (!inputFile.exists()) {
 				System.err.println("❌ El archivo de entrada no existe.");
 				return 1;
