@@ -37,7 +37,7 @@ import tunit.UnitaryTransformations;
  */
 @Command(name = "nes-excel", mixinStandardHelpOptions = true, version = "1.0", description = "Nodo para la transformación Excel")
 
-public class Excel implements Callable<Integer> {
+public class NXLSX implements Callable<Integer> {
 
 	/** Archivo de entrada. */
 	@Option(names = { "-i", "--input" }, description = "Archivo de entrada")
@@ -110,10 +110,10 @@ public class Excel implements Callable<Integer> {
 	    try (FileInputStream fis = new FileInputStream(file)) {
 	        return new XSSFWorkbook(fis);
 	    } catch (Exception e) {
-			Excel.printModuleLogSpace(true, false);
-			Excel.printModuleLog("❌ Error fatal al cargar el fichero de origen: " + e.getMessage(), true);
+			NXLSX.printModuleLogSpace(true, false);
+			NXLSX.printModuleLog("❌ Error fatal al cargar el fichero de origen: " + e.getMessage(), true);
 			e.printStackTrace();
-			Excel.printModuleLogSpace(true, false);	
+			NXLSX.printModuleLogSpace(true, false);	
 			throw new IllegalStateException("Error al cargar el fichero: "+file.getAbsolutePath());
 	    }
 	} 
@@ -149,11 +149,11 @@ public class Excel implements Callable<Integer> {
 			opt.setOutputFile(fileOut);
 			XSSFWorkbook workbook = loadIputWorkbook(opt.getInputFile());
 
-	        Excel.printModuleLogSpace(false, true);
-	        Excel.printModuleLog("🚀 Iniciando Tratamiento Excel -->", false);
-	        Excel.printModuleLog("📥 Fichero Inicial:" + this.inputFile.getAbsolutePath(), false);
-	        Excel.printModuleLog("📤 Fichero Final:  " + this.outputFile.getAbsolutePath(), false);
-	        Excel.printModuleLogSpace(false, false);
+	        NXLSX.printModuleLogSpace(false, true);
+	        NXLSX.printModuleLog("🚀 Iniciando Tratamiento Excel -->", false);
+	        NXLSX.printModuleLog("📥 Fichero Inicial:" + this.inputFile.getAbsolutePath(), false);
+	        NXLSX.printModuleLog("📤 Fichero Final:  " + this.outputFile.getAbsolutePath(), false);
+	        NXLSX.printModuleLogSpace(false, false);
 
 			// Procesar cada tarea solicitada por línea de comandos
 			for (String iTask : listTaskInCommand) {
@@ -163,8 +163,8 @@ public class Excel implements Callable<Integer> {
 				inputDataTask = Arrays.copyOfRange(inputDataTask, 1, inputDataTask.length); //el primer parámetro es la tarea, ya no nos hace falta
 				TaskOptionsConfig optTaskConfig = new TaskOptionsConfig(fctc, currentTask, inputDataTask); //cargamos los parámetros establecidos en el fichero de configuración y los combinamos con los establecidos en la línea de comandos
 				TaskOptions optTask = optTaskConfig.getTaskOptions(); //obtenemos los parametros de la tarea ya montados en el objeto.
-				Excel.printModuleLog("📌 Iniciando Tarea:  " + currentTask, false);
-				Excel.printModuleLog("🎛️ Parámetros de la Tarea:  " + String.join(", ", inputDataTask), false);
+				NXLSX.printModuleLog("📌 Iniciando Tarea:  " + currentTask, false);
+				NXLSX.printModuleLog("🎛️ Parámetros de la Tarea:  " + String.join(", ", inputDataTask), false);
 				switch (optTask.getModule()) {
 				case "merge":
 					MergeSheets cmb = new MergeSheets(opt, optTask);
@@ -178,20 +178,20 @@ public class Excel implements Callable<Integer> {
 				default:
 					break;
 				}
-				Excel.printModuleLog("✅ Finalizada Tarea:  " + currentTask, false);
+				NXLSX.printModuleLog("✅ Finalizada Tarea:  " + currentTask, false);
 			}
 			//Escribimos el fichero final, depués de haber procesado todas las tareas. 
 			workbook.write(out);
-	        Excel.printModuleLogSpace(false, true);
-	        Excel.printModuleLog("🚀 ¡Operación completada con éxito! Excel generado correctamente en:" +fileOut.getName(), false);
-	        Excel.printModuleLogSpace(false, false);			
+	        NXLSX.printModuleLogSpace(false, true);
+	        NXLSX.printModuleLog("🚀 ¡Operación completada con éxito! Excel generado correctamente en:" +fileOut.getName(), false);
+	        NXLSX.printModuleLogSpace(false, false);			
 			return 0;
 
 		} catch (Exception e) {
-			Excel.printModuleLogSpace(true, false);
-			Excel.printModuleLog("❌ Error fatal al general el Excel: " + e.getMessage(), true);
+			NXLSX.printModuleLogSpace(true, false);
+			NXLSX.printModuleLog("❌ Error fatal al general el Excel: " + e.getMessage(), true);
 			e.printStackTrace();
-			Excel.printModuleLogSpace(true, false);	
+			NXLSX.printModuleLogSpace(true, false);	
 			return 1;
 		}
 	}
@@ -202,7 +202,7 @@ public class Excel implements Callable<Integer> {
 	 * @param args Argumentos de la línea de comandos.
 	 */
 	public static void main(String[] args) {
-		int exitCode = new CommandLine(new Excel()).execute(args);
+		int exitCode = new CommandLine(new NXLSX()).execute(args);
 		System.exit(exitCode);
 
 	}

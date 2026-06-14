@@ -3,8 +3,8 @@ package merge;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import global.ExcelUtilRowMode;
-import global.ExcelUtils;
+import global.NXLSXUtilRowMode;
+import global.NXLSXUtils;
 import global.MasterOperation;
 import global.options.ComunOptions;
 import global.options.TaskOptions;
@@ -58,8 +58,8 @@ public class MergeSheets extends MasterOperation {
 					// copiamos el cuerpo de la hoja
 					for (Row oldRow : sourceSheet) {
 						// Generamos y tratamos cada fila de la hoja
-						ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(oldRow, outSheet.createRow(currentRow++));
-						ExcelUtils.copyRow(excelOpt, fOut, styleMap);
+						NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(oldRow, outSheet.createRow(currentRow++));
+						NXLSXUtils.copyRow(excelOpt, fOut, styleMap);
 					}
 				}
 			}

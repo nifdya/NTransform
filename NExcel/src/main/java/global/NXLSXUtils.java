@@ -19,7 +19,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
  * Utilidades para la manipulación y copia de datos en libros de Excel. Incluye
  * funciones para copiar filas, celdas, rangos y realizar búsquedas de texto.
  */
-public class ExcelUtils {
+public class NXLSXUtils {
 
 	/**
 	 * Aplica el estilo de una celda de origen a una de destino reutilizando el mapa
@@ -53,7 +53,7 @@ public class ExcelUtils {
 	 * @param destWorkbook Libro de destino.
 	 * @param styleMap     Mapa para la gestión eficiente de estilos.
 	 */
-	public static void copyRow(ExcelUtilRowMode row, Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
+	public static void copyRow(NXLSXUtilRowMode row, Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 		if (row.rowInput == null) {
 			return;
 		}
@@ -64,7 +64,7 @@ public class ExcelUtils {
 				Cell newCell = row.rowOutput.createCell(j);
 
 				// Gestión de estilos estática
-				ExcelUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
+				NXLSXUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
 				switch (row.mode) {
 				case 2:
 					copyCellValueAndReplace(oldCell, newCell, row.valueSearch, row.valueReplace);
@@ -170,7 +170,7 @@ public class ExcelUtils {
 	 */
 	public static boolean rowContains(Row rowInput, String valueStr, Integer[] positions, int modo) {
 		for (int i = 0; i < positions.length; i++) {
-			if (ExcelUtils.columnContains(rowInput, positions[i], valueStr, modo)) {
+			if (NXLSXUtils.columnContains(rowInput, positions[i], valueStr, modo)) {
 				return true; // Retorna true inmediatamente al encontrar coincidencia
 			}
 		}
@@ -213,7 +213,7 @@ public class ExcelUtils {
 		// Caso A: Buscar en posiciones específicas
 		if (positions != null && positions.length > 0) {
 			for (int i = 0; i < positions.length; i++) {
-				if (ExcelUtils.columnContains(rowInput, positions[i], valueStrs, modo)) {
+				if (NXLSXUtils.columnContains(rowInput, positions[i], valueStrs, modo)) {
 					return true;
 				}
 			}
@@ -228,7 +228,7 @@ public class ExcelUtils {
 			
 			// Buscamos cada valor de la lista en todas las posiciones de la fila
 			for (int i = 0; i < valueStrs.length; i++) {
-				if (ExcelUtils.rowContains(rowInput, valueStrs[i], allPositions, modo)) {
+				if (NXLSXUtils.rowContains(rowInput, valueStrs[i], allPositions, modo)) {
 					return true;
 				}
 			}
@@ -288,7 +288,7 @@ public class ExcelUtils {
 	public static boolean rowContains(Row rowInput, String valueStr, Integer[] positions) {
 		boolean exist = false;
 		for (int i = 0; i < positions.length && exist == false; i++) {
-			exist = ExcelUtils.columnContains(rowInput, positions[i], valueStr);
+			exist = NXLSXUtils.columnContains(rowInput, positions[i], valueStr);
 		}
 		return exist;
 	}
@@ -308,11 +308,11 @@ public class ExcelUtils {
 		boolean exist = false;
 		if (positions != null && positions.length > 0) {
 			for (int i = 0; i < positions.length && exist == false; i++) {
-				exist = ExcelUtils.columnContains(rowInput, positions[i], valueStrs);
+				exist = NXLSXUtils.columnContains(rowInput, positions[i], valueStrs);
 			}
 		} else {
 			for (int i = 0; i < valueStrs.length && exist == false; i++) {
-				exist = ExcelUtils.rowContains(rowInput, valueStrs[i]);
+				exist = NXLSXUtils.rowContains(rowInput, valueStrs[i]);
 			}
 		}
 		return exist;
@@ -329,7 +329,7 @@ public class ExcelUtils {
 	public static boolean rowContains(Row rowInput, String valueStr) {
 		boolean exist = false;
 		for (int i = 0; i < rowInput.getLastCellNum() && exist == false; i++) {
-			exist = ExcelUtils.columnContains(rowInput, i, valueStr);
+			exist = NXLSXUtils.columnContains(rowInput, i, valueStr);
 		}
 		return exist;
 	}
@@ -560,7 +560,7 @@ public class ExcelUtils {
 	 * @param destWorkbook Libro de destino para la gestión de estilos.
 	 * @param styleMap     Mapa para reutilizar estilos existentes.
 	 */
-	public static void fillRowWithPositions(ExcelUtilRowMode row, Integer[] positions, Workbook destWorkbook,
+	public static void fillRowWithPositions(NXLSXUtilRowMode row, Integer[] positions, Workbook destWorkbook,
 			Map<Integer, CellStyle> styleMap) {
 		if (row.rowInput == null || row.rowOutput == null || positions == null)
 			return;
@@ -570,7 +570,7 @@ public class ExcelUtils {
 			if (oldCell != null) {
 				Cell newCell = row.rowOutput.createCell(i);
 				// Gestión de estilos idéntica a copyRow
-				ExcelUtils.copyCell(oldCell, newCell, destWorkbook, styleMap);
+				NXLSXUtils.copyCell(oldCell, newCell, destWorkbook, styleMap);
 
 			}
 		}
@@ -586,7 +586,7 @@ public class ExcelUtils {
 	 * @param destWorkbook Libro de destino para la gestión de estilos.
 	 * @param styleMap     Mapa para reutilizar estilos existentes.
 	 */
-	public static void fillRowExcludingPositions(ExcelUtilRowMode row, Integer[] excludePositions,
+	public static void fillRowExcludingPositions(NXLSXUtilRowMode row, Integer[] excludePositions,
 			Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 		if (row.rowInput == null || row.rowOutput == null)
 			return;
@@ -599,7 +599,7 @@ public class ExcelUtils {
 				Cell oldCell = row.rowInput.getCell(j);
 				if (oldCell != null) {
 					Cell newCell = row.rowOutput.createCell(targetCol);
-					ExcelUtils.copyCell(oldCell, newCell, destWorkbook, styleMap);
+					NXLSXUtils.copyCell(oldCell, newCell, destWorkbook, styleMap);
 				}
 				targetCol++;
 			}
@@ -615,8 +615,8 @@ public class ExcelUtils {
 	 * @param styles  Mapa de estilos.
 	 */
 	private static void copyCell(Cell oldCell, Cell newCell, Workbook wb, Map<Integer, CellStyle> styles) {
-		ExcelUtils.applyStyle(oldCell, newCell, wb, styles);
-		ExcelUtils.copyCellValue(oldCell, newCell);
+		NXLSXUtils.applyStyle(oldCell, newCell, wb, styles);
+		NXLSXUtils.copyCellValue(oldCell, newCell);
 	}
 
 	/**
@@ -632,7 +632,7 @@ public class ExcelUtils {
 	 * @param destWorkbook    Libro de destino.
 	 * @param styleMap        Mapa de estilos.
 	 */
-	public static void splitColumnsByRegex(ExcelUtilRowMode row, Integer[] targetPositions, String regex,
+	public static void splitColumnsByRegex(NXLSXUtilRowMode row, Integer[] targetPositions, String regex,
 			boolean keepOriginal, Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 
 		if (row.rowInput == null || row.rowOutput == null)
@@ -651,18 +651,18 @@ public class ExcelUtils {
 
 				// Si decidimos mantener la original, la copiamos primero
 				if (keepOriginal) {
-					ExcelUtils.copyCell(oldCell, row.rowOutput.createCell(targetCol++), destWorkbook, styleMap);
+					NXLSXUtils.copyCell(oldCell, row.rowOutput.createCell(targetCol++), destWorkbook, styleMap);
 				}
 
 				// Creamos una nueva columna por cada parte resultante del split
 				for (String part : parts) {
 					Cell newCell = row.rowOutput.createCell(targetCol++);
-					ExcelUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
+					NXLSXUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
 					newCell.setCellValue(part.trim());
 				}
 			} else if (oldCell != null) {
 				// Columna normal (no se divide)
-				ExcelUtils.copyCell(oldCell, row.rowOutput.createCell(targetCol++), destWorkbook, styleMap);
+				NXLSXUtils.copyCell(oldCell, row.rowOutput.createCell(targetCol++), destWorkbook, styleMap);
 			}
 		}
 	}
@@ -713,7 +713,7 @@ public class ExcelUtils {
 	 * @param styleMap        Mapa para la gestión eficiente de estilos.
 	 */
 
-	public static void splitColumnsByRegexGroups(ExcelUtilRowMode row, Integer[] targetPositions,
+	public static void splitColumnsByRegexGroups(NXLSXUtilRowMode row, Integer[] targetPositions,
 			java.util.regex.Pattern pattern, String[] groupTemplates, boolean keepOriginal, String defaultValue,
 			Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 
@@ -738,7 +738,7 @@ public class ExcelUtils {
 				boolean matches = matcher.find();
 				for (String template : groupTemplates) {
 					Cell newCell = row.rowOutput.createCell(targetCol++);
-					ExcelUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
+					NXLSXUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
 
 					if (matches) {
 						try {
@@ -777,7 +777,7 @@ public class ExcelUtils {
 	 * 
 	 */
 
-	public static void joinColumnsByRegex(ExcelUtilRowMode row, Integer[] targetPositions, String joinTemplate,
+	public static void joinColumnsByRegex(NXLSXUtilRowMode row, Integer[] targetPositions, String joinTemplate,
 			boolean keepOriginal, String defaultValue, Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 
 		if (row.rowInput == null || row.rowOutput == null)
@@ -812,7 +812,7 @@ public class ExcelUtils {
 				// Solo insertamos la columna unida
 				if (j == positionsList.get(positionsList.size() - 1)) {
 					Cell newCell = row.rowOutput.createCell(targetCol++);
-					ExcelUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
+					NXLSXUtils.applyStyle(oldCell, newCell, destWorkbook, styleMap);
 					newCell.setCellValue(resultValue);
 				}
 			} else if (oldCell != null) {
@@ -838,7 +838,7 @@ public class ExcelUtils {
 	 * @param destWorkbook     Libro de destino.
 	 * @param styleMap         Mapa de estilos.
 	 */
-	public static void mergeColumns(ExcelUtilRowMode row, Integer[] positionsToMerge, Integer targetPosition,
+	public static void mergeColumns(NXLSXUtilRowMode row, Integer[] positionsToMerge, Integer targetPosition,
 			String separator, boolean keepOriginal, Workbook destWorkbook, Map<Integer, CellStyle> styleMap) {
 
 		if (row.rowInput == null || row.rowOutput == null)
@@ -890,7 +890,7 @@ public class ExcelUtils {
 			Cell mergedCell = row.rowOutput.createCell(outputPos);
 
 			if (firstMergeCell != null) {
-				ExcelUtils.applyStyle(firstMergeCell, mergedCell, destWorkbook, styleMap);
+				NXLSXUtils.applyStyle(firstMergeCell, mergedCell, destWorkbook, styleMap);
 			}
 			mergedCell.setCellValue(mergedValue.toString());
 		}

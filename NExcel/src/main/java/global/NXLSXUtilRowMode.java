@@ -7,7 +7,7 @@ import org.apache.poi.ss.usermodel.Row;
  * 
  */
 
-public class ExcelUtilRowMode {
+public class NXLSXUtilRowMode {
 	/** Modo de copiado de la celda */
 	Integer mode = 0;
 	/** Fila de entrada */
@@ -20,7 +20,7 @@ public class ExcelUtilRowMode {
 	String valueReplace;
 
 	/** Constructor de la clase */
-	public ExcelUtilRowMode(Row rIn, Row rOut) {
+	public NXLSXUtilRowMode(Row rIn, Row rOut) {
 		this.mode = 0;
 		this.rowInput = rIn;
 		this.rowOutput = rOut;
