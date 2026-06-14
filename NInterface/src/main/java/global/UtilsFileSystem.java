@@ -57,6 +57,37 @@ public class UtilsFileSystem {
                 .toArray(String[]::new); // Converts the stream back to String[]
     }
     
+    public static String getJarPath()
+    {
+        try {
+            // 1. Obtiene la ubicación absoluta desde donde se ejecuta el código
+            String executionPath = UtilsFileSystem.class.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()
+                    .getPath();
+            
+            File baseDir = new File(executionPath);
+            
+            // Si termina en un archivo .jar, obtenemos su carpeta contenedora
+            if (executionPath.endsWith(".jar")) {
+                baseDir = baseDir.getParentFile();
+            } else {
+                // Si estamos en el IDE (Maven/Gradle), subirá las carpetas necesarias 
+                // para salir de "target/classes" o carpetas similares hacia la raíz del proyecto
+                while (baseDir != null && (baseDir.getName().equals("classes") || baseDir.getName().equals("target") || baseDir.getName().equals("bin"))) {
+                    baseDir = baseDir.getParentFile();
+                }
+            }
+            
+            
+            return baseDir.getAbsolutePath();
+            
+        } catch (URISyntaxException e) {
+            return new File("resources").getAbsolutePath();
+        }   	
+    }
+    
     public static String getResourcesPath() {
         try {
             // 1. Obtiene la ubicación absoluta desde donde se ejecuta el código

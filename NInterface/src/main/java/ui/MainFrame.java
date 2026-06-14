@@ -3,22 +3,23 @@ package ui;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import global.FileSelectorManager;
 import global.UtilsFileSystem;
+import global.UtilsPipeline;
 import global.task.TaskConfig;
 
 public class MainFrame extends JFrame {
@@ -82,42 +83,89 @@ public class MainFrame extends JFrame {
 	}
 
 	private void initTopContainer() {
-		// =============================================================
-		// 1. PANEL SUPERIOR: Selector Multi-JSON y Datos Base
-		// =============================================================
-		JPanel topContainer = new JPanel(new BorderLayout(5, 5));
-		topContainer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+	    // =============================================================
+	    // 1. PANEL SUPERIOR: Selector Multi-JSON y Datos Base
+	    // =============================================================
+	    JPanel topContainer = new JPanel(new BorderLayout(5, 5));
+	    topContainer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-		JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		selectorPanel.add(new JLabel("Origen de datos dinámicos:"));
+	    JPanel selectorPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    selectorPanel.add(new JLabel("Origen de datos dinámicos:"));
 
-		// CORRECCIÓN: Inicialización del combo box y su listener de eventos
-		configSelector = new JComboBox<>(jsonFiles);
-		configSelector.addActionListener(e -> {
-			String file = (String) configSelector.getSelectedItem();
-			if (file != null) {
-				loadJsonConfiguration(file);
-			}
-		});
-		selectorPanel.add(configSelector);
-		topContainer.add(selectorPanel, BorderLayout.NORTH);
+	    configSelector = new JComboBox<>(jsonFiles);
+	    configSelector.addActionListener(e -> {
+	        String file = (String) configSelector.getSelectedItem();
+	        if (file != null) {
+	            loadJsonConfiguration(file);
+	        }
+	    });
+	    selectorPanel.add(configSelector);
+	    topContainer.add(selectorPanel, BorderLayout.NORTH);
 
-		JPanel fieldsPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-		fieldsPanel.setBorder(BorderFactory.createTitledBorder("Estructura de Ficheros del Pipeline"));
-		fieldsPanel.add(new JLabel("Fichero Inicial (origen):"));
-		txtOrigen = new JTextField("");
-		fieldsPanel.add(txtOrigen);
+	    // GridBagLayout para alinear perfectamente la estructura
+	    JPanel fieldsPanel = new JPanel(new GridBagLayout());
+	    fieldsPanel.setBorder(BorderFactory.createTitledBorder("Estructura de Ficheros del Pipeline"));
+	    
+	    GridBagConstraints gbc = new GridBagConstraints();
+	    gbc.insets = new Insets(5, 5, 5, 5);
+	    gbc.fill = GridBagConstraints.HORIZONTAL;
 
-		fieldsPanel.add(new JLabel("Fichero Final (destino):"));
-		txtDestino = new JTextField("");
-		fieldsPanel.add(txtDestino);
+	    // --- FILA 1: FICHERO INICIAL ---
+	    gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.0;
+	    fieldsPanel.add(new JLabel("Fichero Inicial (origen):"), gbc);
 
-		fieldsPanel.add(new JLabel("Estructura Pasos Intermedios:"));
-		txtPipeline = new JTextField("");
-		fieldsPanel.add(txtPipeline);
+	    gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 1.0;
+	    txtOrigen = new JTextField("");
+	    txtOrigen.setEditable(false);
+	    fieldsPanel.add(txtOrigen, gbc);
 
-		topContainer.add(fieldsPanel, BorderLayout.CENTER);
-		add(topContainer, BorderLayout.NORTH);
+	    gbc.gridx = 2; gbc.gridy = 0; gbc.weightx = 0.0;
+	    JButton btnBrowseOrigen = new JButton("...");
+	    btnBrowseOrigen.addActionListener(e -> {
+	        String path = FileSelectorManager.selectJsonFile(UtilsFileSystem.getJarPath());
+	        if (path != null) txtOrigen.setText(path);
+	    });
+	    fieldsPanel.add(btnBrowseOrigen, gbc);
+
+	    // --- FILA 2: FICHERO FINAL ---
+	    gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
+	    fieldsPanel.add(new JLabel("Fichero Final (destino):"), gbc);
+
+	    gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 1.0;
+	    txtDestino = new JTextField("");
+	    txtDestino.setEditable(false);
+	    
+	    // Automatización: Escucha cambios en txtDestino para generar el intermedio
+	    txtDestino.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+	        public void insertUpdate(javax.swing.event.DocumentEvent e) {txtPipeline.setText(UtilsPipeline.getPipelineField(txtDestino.getText())); }
+	        public void removeUpdate(javax.swing.event.DocumentEvent e) {txtPipeline.setText(UtilsPipeline.getPipelineField(txtDestino.getText()));}
+	        public void changedUpdate(javax.swing.event.DocumentEvent e) {txtPipeline.setText(UtilsPipeline.getPipelineField(txtDestino.getText())); }
+	    });
+	    fieldsPanel.add(txtDestino, gbc);
+
+	    gbc.gridx = 2; gbc.gridy = 1; gbc.weightx = 0.0;
+	    JButton btnBrowseDestino = new JButton("...");
+	    btnBrowseDestino.addActionListener(e -> {
+	        String path = FileSelectorManager.selectJsonFile(UtilsFileSystem.getJarPath());
+	        if (path != null) {
+	            txtDestino.setText(path); // Esto disparará automáticamente el listener de arriba
+	        }
+	    });
+	    fieldsPanel.add(btnBrowseDestino, gbc);
+
+	    // --- FILA 3: PASOS INTERMEDIOS (AUTOMÁTICO) ---
+	    gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0.0;
+	    fieldsPanel.add(new JLabel("Estructura Pasos Intermedios:"), gbc);
+
+	    // Ocupa las columnas de campo y botón (gridwidth = 2) porque ya no necesita botón propio
+	    gbc.gridx = 1; gbc.gridy = 2; gbc.weightx = 1.0; gbc.gridwidth = 2;
+	    txtPipeline = new JTextField("");
+	    txtPipeline.setEditable(false);
+	    txtPipeline.setBackground(new java.awt.Color(240, 240, 240)); // Visualmente deshabilitado
+	    fieldsPanel.add(txtPipeline, gbc);
+
+	    topContainer.add(fieldsPanel, BorderLayout.CENTER);
+	    add(topContainer, BorderLayout.NORTH);
 	}
 
 	private void initJarPanel() {
@@ -185,9 +233,16 @@ public class MainFrame extends JFrame {
 		pipelineTable = new JTable(tableModel);
 		pipelineTable.setPreferredScrollableViewportSize(new Dimension(500, 150));
 		bottomContainer.add(new JScrollPane(pipelineTable), BorderLayout.CENTER);
+		this.initTableContextMenu();
 
 		JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
+		JButton btnLoadFile = new JButton("💾 Cargar Pipeline Completo (.json)");
+		btnLoadFile.setFont(new Font("SansSerif", Font.BOLD, 13));
+		btnLoadFile.addActionListener(e -> loadPipelineFromFile());
+		actionsPanel.add(btnLoadFile);		
+		
+		
 		JButton btnLimpiar = new JButton("Limpiar Todo");
 		btnLimpiar.addActionListener(e -> tableModel.setRowCount(0));
 		actionsPanel.add(btnLimpiar);
@@ -249,11 +304,7 @@ public class MainFrame extends JFrame {
 			cardsPanel.removeAll();
 			formsMap.clear();
 
-			// =========================================================================
-			// ¡TU SWITCH AQUÍ! Genera los campos fijos del archivo JSON seleccionado
-			// =========================================================================
-			System.err.println("Selector actual cargando: " + fileName);
-
+			
 			// Creamos un panel contenedor para los campos del JSON actual con un diseño
 			// limpio
 			JPanel jsonHeaderFieldsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -568,6 +619,97 @@ private void savePipelineToFile() {
     }
 }
 
+private void loadPipelineFromFile() {
+    // 1. Crear el selector de archivos nativo de Swing para abrir
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Cargar Configuración de Pipeline");
+    
+    // Abrir por defecto en la carpeta de recursos
+    File initialDir = new File(UtilsFileSystem.getJarPath());
+    if (initialDir.exists() && initialDir.isDirectory()) {
+        fileChooser.setCurrentDirectory(initialDir);
+    }
+    
+    fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Archivos JSON (*.json)", "json"));
+
+    int userSelection = fileChooser.showOpenDialog(this);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        File fileToLoad = fileChooser.getSelectedFile();
+        try {
+            // 2. Leer y parsear el archivo JSON
+            JsonNode rootNode = objectMapper.readTree(fileToLoad);
+
+            // 3. Rellenar los campos de texto principales
+            txtOrigen.setText(rootNode.has("inputFile") ? rootNode.get("inputFile").asText() : "");
+            txtDestino.setText(rootNode.has("outputFile") ? rootNode.get("outputFile").asText() : "");
+            txtPipeline.setText(rootNode.has("tempFile") ? rootNode.get("tempFile").asText() : "");
+
+            // 4. Limpiar el modelo de la tabla antes de la carga
+            tableModel.setRowCount(0);
+
+            // 5. Procesar el array de comandos ("commands")
+            if (rootNode.has("commands") && rootNode.get("commands").isArray()) {
+                ArrayNode commandsArray = (ArrayNode) rootNode.get("commands");
+
+                // Mantener el contador de filas totales para asignar el 'siguientePaso'
+                int filaActualIndex = 0;
+
+                for (JsonNode commandNode : commandsArray) {
+                    
+                    // Recuperar metadatos del paso
+                    String jarFile = commandNode.has("jar") ? commandNode.get("jar").asText() : "";
+                    String cmdOptions = commandNode.has("cmdOptions") ? commandNode.get("cmdOptions").asText() : "";
+
+                    // Procesar las tareas internas de este paso agrupado
+                    if (commandNode.has("tasks") && commandNode.get("tasks").isArray()) {
+                        ArrayNode tasksArray = (ArrayNode) commandNode.get("tasks");
+                        
+                        boolean esPrimeraFilaDelPaso = true;
+
+                        for (JsonNode taskNode : tasksArray) {
+                            String taskText = taskNode.has("task") ? taskNode.get("task").asText() : "";
+
+                            // Variables que enviaremos a tu función addAndCheckInstruction
+                            int pasoId = filaActualIndex; 
+                            String jsonOrigenParam;
+                            String cmdOptionsParam;
+
+                            if (esPrimeraFilaDelPaso) {
+                                // La primera fila del bloque muestra los datos reales
+                                jsonOrigenParam = jarFile;
+                                cmdOptionsParam = cmdOptions;
+                                esPrimeraFilaDelPaso = false;
+                            } else {
+                                // Las filas agrupadas secundarias envían vacíos a la tabla
+                                jsonOrigenParam = "";
+                                cmdOptionsParam = "";
+                            }
+
+                            // REUTILIZACIÓN: Llamamos a tu método nativo de inserción y validación
+                            this.addAndCheckInstruction(pasoId, jsonOrigenParam, cmdOptionsParam, taskText);
+                            
+                            // Incrementamos el contador global de filas
+                            filaActualIndex++;
+                        }
+                    }
+                }
+            }
+
+            // Notificación de éxito
+            JOptionPane.showMessageDialog(this,
+                    "¡Pipeline cargado con éxito!\nArchivo: " + fileToLoad.getName(),
+                    "Operación Completada", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error crítico al intentar parsear o leer el archivo de configuración:\n"
+                            + ex.getLocalizedMessage(),
+                    "Error de Carga", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
 
 	private void actualizarCamposSuperioresDelJson(JPanel camposEspeciales) {
 		if (rightPanel == null)
@@ -595,5 +737,64 @@ private void savePipelineToFile() {
 		rightPanel.revalidate();
 		rightPanel.repaint();
 	}
+	private void deleteSelectedInstruction() {
+	    int selectedRow = pipelineTable.getSelectedRow();
+
+	    // Validación: Verificar que haya una fila seleccionada
+	    if (selectedRow == -1) {
+	        JOptionPane.showMessageDialog(this, 
+	                "Por favor, selecciona una fila de la tabla para eliminar.", 
+	                "Aviso", JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+
+	    // 1. Eliminar la fila del modelo
+	    tableModel.removeRow(selectedRow);
+
+	    // 2. Recalcular secuencialmente la columna 0 (Número de Paso)
+	    int totRows = tableModel.getRowCount();
+	    for (int i = 0; i < totRows; i++) {
+	        // Asignamos el nuevo índice 'i' a la columna 0 de cada fila
+	        tableModel.setValueAt(i, i, 0); 
+	    }
+	}
+	private void initTableContextMenu() {
+	    // 1. Crear el menú flotante y su opción de borrado
+	    JPopupMenu popupMenu = new JPopupMenu();
+	    JMenuItem deleteItem = new JMenuItem("Eliminar Instrucción");
+	    deleteItem.setIcon(javax.swing.UIManager.getIcon("InternalFrame.closeIcon")); // Icono nativo de aspa (opcional)
+	    
+	    // Asociar la acción de borrado al ítem de menú
+	    deleteItem.addActionListener(e -> deleteSelectedInstruction());
+	    popupMenu.add(deleteItem);
+
+	    // 2. Escuchador de ratón en la tabla para detectar el clic derecho
+	    this.pipelineTable.addMouseListener(new java.awt.event.MouseAdapter() {
+	        @Override
+	        public void mousePressed(java.awt.event.MouseEvent e) {
+	            showPopup(e);
+	        }
+
+	        @Override
+	        public void mouseReleased(java.awt.event.MouseEvent e) {
+	            showPopup(e);
+	        }
+
+	        // Método auxiliar para detectar el clic derecho según el Sistema Operativo
+	        private void showPopup(java.awt.event.MouseEvent e) {
+	            if (e.isPopupTrigger()) {
+	                // Seleccionar automáticamente la fila sobre la que se hizo clic derecho
+	                int row = pipelineTable.rowAtPoint(e.getPoint());
+	                if (row >= 0 && row < pipelineTable.getRowCount()) {
+	                	pipelineTable.setRowSelectionInterval(row, row);
+	                }
+	                
+	                // Mostrar el menú contextual en las coordenadas exactas del cursor
+	                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+	            }
+	        }
+	    });
+	}
+
 
 }
