@@ -228,15 +228,16 @@ public class MainFrame extends JFrame {
 	private void loadJsonConfiguration(String fileName) {
 		try {
 			List<TaskConfig> tasksList = null;
-			File externalFile = new File(fileName);
+			String absoluteFilePath=UtilsFileSystem.getResourcesPath()+"\\"+fileName;
+			File externalFile = new File(absoluteFilePath);
 
 			if (externalFile.exists()) {
 				tasksList = objectMapper.readValue(externalFile, new TypeReference<List<TaskConfig>>() {
 				});
 			} else {
-				try (InputStream is = getClass().getClassLoader().getResourceAsStream(fileName)) {
+				try (InputStream is = getClass().getClassLoader().getResourceAsStream(absoluteFilePath)) {
 					if (is == null) {
-						throw new java.io.FileNotFoundException("No se encontró el fichero: " + fileName);
+						throw new java.io.FileNotFoundException("No se encontró el fichero: " + absoluteFilePath);
 					}
 					tasksList = objectMapper.readValue(is, new TypeReference<List<TaskConfig>>() {
 					});
