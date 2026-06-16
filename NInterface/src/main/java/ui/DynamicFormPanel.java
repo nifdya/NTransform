@@ -11,30 +11,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Extensión de la clase JPanel para gestionar el panel dinámico donde se
+ * establece la información de los parámetros y opciones de comando de la tarea
+ * que se está configurando.
+ * 
+ * @version 1.0
+ */
 public class DynamicFormPanel extends JPanel {
+	/** Parámetros de la tarea, según el fichero de configuración*/
 	private final Map<String, ParamConfig> paramsConfig;
-	private final ArrayList< CmdOptionsConfig> cmdOptions;
+	/** Opciones de comando de la tarea*/
+	private final ArrayList<CmdOptionsConfig> cmdOptions;
 
+	/** Componentes para las opciones de parámetros y opciones de comandos*/
 	private final Map<String, JComponent> fieldsMap = new HashMap<>();
 	private final Map<String, JComponent> fieldsOptMap = new HashMap<>();
 
+	/**
+	 * Constructor de la clase 
+	 * @param task - Tarea con la configuración a cargar
+	 */
 	public DynamicFormPanel(TaskConfig task) {
 		this.paramsConfig = task.getParams();
 		this.cmdOptions = (ArrayList<CmdOptionsConfig>) task.getCmdOptions();
-		
+
 		setLayout(new GridBagLayout());
 		setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		buildForm();
 	}
-	
-	private int buildFormParams(GridBagConstraints gbc, int row)
-	{
+
+
+	private int buildFormParams(GridBagConstraints gbc, int row) {
 		for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
 			String paramName = entry.getKey();
 			ParamConfig prop = entry.getValue();
 			String desc = prop.getDescription() != null ? prop.getDescription() : "";
 
-			// 1. Etiqueta con Tooltip (Punto 2)
+			// Etiqueta con Tooltip 
 			gbc.gridx = 0;
 			gbc.gridy = row;
 			gbc.weightx = 0.3;
@@ -43,7 +57,7 @@ public class DynamicFormPanel extends JPanel {
 			label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
 			add(label, gbc);
 
-			// 2. Componente de entrada con Tooltip (Punto 2)
+			// Componente de entrada con Tooltip (Punto 2)
 			gbc.gridx = 1;
 			gbc.weightx = 0.7;
 			JComponent inputComponent = createComponentForType(prop.getType(), desc);
@@ -52,17 +66,16 @@ public class DynamicFormPanel extends JPanel {
 
 			fieldsMap.put(paramName, inputComponent);
 			row++;
-		}	
+		}
 		return row;
 	}
-	private int buildFormCmdOptions(GridBagConstraints gbc, int row)
-	{
-		for (CmdOptionsConfig cmdConfig: this.cmdOptions)
-		{
+
+	private int buildFormCmdOptions(GridBagConstraints gbc, int row) {
+		for (CmdOptionsConfig cmdConfig : this.cmdOptions) {
 			String paramName = cmdConfig.getName();
-			
+
 			String desc = cmdConfig.getDescription() != null ? cmdConfig.getDescription() : "";
-			
+
 			// 1. Etiqueta con Tooltip (Punto 2)
 			gbc.gridx = 0;
 			gbc.gridy = row;
@@ -71,24 +84,21 @@ public class DynamicFormPanel extends JPanel {
 			JLabel label = new JLabel(labelText);
 			label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
 			add(label, gbc);
-			
+
 			// 2. Componente de entrada con Tooltip (Punto 2)
 			gbc.gridx = 1;
 			gbc.weightx = 0.7;
-			JComponent component=null;
-			if(paramName.equals("charset"))
-			{
-				component=createComponentForType("Charset", desc);
-			}
-			else
-			{
+			JComponent component = null;
+			if (paramName.equals("charset")) {
+				component = createComponentForType("Charset", desc);
+			} else {
 				component = createComponentForType("String", desc);
 			}
 			component.setToolTipText(desc); // Asigna el tooltip al campo de entrada
 			add(component, gbc);
 			fieldsOptMap.put(paramName, component);
 			row++;
-		}	
+		}
 		return row;
 	}
 
@@ -98,14 +108,13 @@ public class DynamicFormPanel extends JPanel {
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		int row = 0;
 
-		if(cmdOptions!=null && cmdOptions.size()>0)
-		{
-			row=this.buildFormCmdOptions(gbc, row);
+		if (cmdOptions != null && cmdOptions.size() > 0) {
+			row = this.buildFormCmdOptions(gbc, row);
 		}
 		if (paramsConfig != null) {
-			row=this.buildFormParams(gbc,row);
+			row = this.buildFormParams(gbc, row);
 		}
-		
+
 	}
 
 	private JComponent createComponentForType(String type, String description) {
@@ -123,13 +132,16 @@ public class DynamicFormPanel extends JPanel {
 		case "ListString":
 			return new JTextField(20);
 		case "Charset":
-			return CharsetCombo.createCharsetCombo(); 
+			return CharsetCombo.createCharsetCombo();
 		default:
 			return new JTextField(20);
 		}
 	}
 
-
+	/**
+	 * Valida el formulario del panel
+	 * @return Boolean - true, si pasa las validaciones | false, en caso que no pase las validaciones
+	 */
 	public boolean validateForm() {
 		boolean isValid = true;
 
@@ -146,7 +158,7 @@ public class DynamicFormPanel extends JPanel {
 			comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
 			comp.setToolTipText(defaultDesc);
 
-			// 1. Extraer el valor actual del componente en formato String
+			// Extrae el valor actual del componente en formato String
 			String value = "";
 			if (comp instanceof JTextField) {
 				value = ((JTextField) comp).getText().trim();
@@ -159,7 +171,7 @@ public class DynamicFormPanel extends JPanel {
 				value = ((JCheckBox) comp).isSelected() ? "true" : "false";
 			}
 
-			// 2. Validación de Campos Obligatorios
+			// Validación de los campos obligatorios
 			if (prop.isRequired() && value.isEmpty()) {
 				comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
 				comp.setToolTipText("Este campo es obligatorio.");
@@ -167,7 +179,7 @@ public class DynamicFormPanel extends JPanel {
 				continue; // Pasa al siguiente campo
 			}
 
-			// 3. Validación de Tipos de Datos (solo si tiene contenido)
+			// Validación de los tipos de datos (solo si tiene contenido)
 			if (!value.isEmpty()) {
 				boolean typeError = false;
 				String errorMsg = "";
@@ -204,21 +216,20 @@ public class DynamicFormPanel extends JPanel {
 				}
 			}
 		}
-		if(this.cmdOptions!=null && this.cmdOptions.size()>0)
-		{
+		if (this.cmdOptions != null && this.cmdOptions.size() > 0) {
 			for (CmdOptionsConfig config : this.cmdOptions) {
 				String paramName = config.getName();
 				JComponent comp = fieldsOptMap.get(paramName);
-				
+
 				if (comp == null)
 					continue;
-				
+
 				// Restaurar estado visual por defecto antes de validar de nuevo
 				String defaultDesc = config.getDescription() != null ? config.getDescription() : "";
 				comp.setBorder(UIManager.getLookAndFeel().getDefaults().getBorder("TextField.border"));
 				comp.setToolTipText(defaultDesc);
-				
-				// 1. Extraer el valor actual del componente en formato String
+
+				// Extrae el valor actual del componente en formato String
 				String value = "";
 				if (comp instanceof JTextField) {
 					value = ((JTextField) comp).getText().trim();
@@ -230,28 +241,29 @@ public class DynamicFormPanel extends JPanel {
 				} else if (comp instanceof JCheckBox) {
 					value = ((JCheckBox) comp).isSelected() ? "true" : "false";
 				}
-				
-				// 2. Validación de Campos Obligatorios
+
+				// Valida los campos obligatorios
 				if (config.isRequired() && value.isEmpty()) {
 					comp.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
 					comp.setToolTipText("Este campo es obligatorio.");
 					isValid = false;
 					continue; // Pasa al siguiente campo
 				}
-				
-				
-			}			
-		}
 
+			}
+		}
 
 		// Refresca visualmente el panel para aplicar los cambios de borde de inmediato
 		repaint();
 		return isValid;
 	}
 
+
 	/**
 	 * Devuelve los parámetros formateados en formato clave=valor unidos por
 	 * tuberías.
+	 * 
+	 * @return Cadena con los parametros serializados. Ej:  "ObtenerFilaColumnaContiene|rowPositions=1;2;3;4|rowText=b112;a111;a112"
 	 */
 	public String getSerializedParams() {
 		StringBuilder sb = new StringBuilder();
@@ -280,26 +292,37 @@ public class DynamicFormPanel extends JPanel {
 		}
 		return sb.toString();
 	}
-	public String getOptionCmdOption(String name)
-	{
+
+	/**
+	 * Devuelve la opción del comando.
+	 * 
+	 * @param name - Nombre de la opcion
+	 * @return - Opción de comando (atributo option)
+	 */
+	public String getOptionCmdOption(String name) {
 		CmdOptionsConfig config = null;
 		for (CmdOptionsConfig cmd : this.cmdOptions) {
-		    if (name.equals(cmd.getName())) {
-		        config = cmd;
-		        break; // Detiene la búsqueda al encontrar el primero
-		    }
+			if (name.equals(cmd.getName())) {
+				config = cmd;
+				break; // Detiene la búsqueda al encontrar el primero
+			}
 		}
 		return config.getOption();
 
 	}
+	/**
+	 * Devuelve las opciones de comando para la tarea serializadas
+	 * 
+	 * @return Cadena con las opciones serializadas
+	 */
 	public String getSerializedCmdOptions() {
 		StringBuilder sb = new StringBuilder();
 		for (Map.Entry<String, JComponent> entry : fieldsOptMap.entrySet()) {
 			String param = entry.getKey();
 			JComponent comp = entry.getValue();
 			String val = "";
-			String opt="";
-			
+			String opt = "";
+
 			if (comp instanceof JCheckBox) {
 				val = ((JCheckBox) comp).isSelected() ? "true" : "";
 			} else if (comp instanceof JComboBox) {
@@ -310,9 +333,9 @@ public class DynamicFormPanel extends JPanel {
 			} else if (comp instanceof JTextField) {
 				val = ((JTextField) comp).getText().trim();
 			}
-			
+
 			if (val != null && !val.isEmpty()) {
-				opt=this.getOptionCmdOption(param);
+				opt = this.getOptionCmdOption(param);
 				if (sb.length() > 0)
 					sb.append(" ");
 				sb.append(opt).append(" ").append(val);

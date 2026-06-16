@@ -1,42 +1,41 @@
 package global;
 
 import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
-
+/**
+ * Clase par la gestión de un selector de ficheros
+ * 
+ * @version 1.0
+ */
 public class FileSelectorManager {
 
     /**
-     * Opens a JFileChooser dialog to select a JSON file.
-     * @param initialDirectoryPath The path where the chooser should open by default.
-     * @return The absolute path of the selected file, or null if the user cancelled.
+     * 
+     * Abre un JFileChooser dialog para selecionar un fichero JSON y devolver su ruta absoluta
+     * 
+     * @param initialDirectoryPath - Ruta del directorio de apertura pro defecto
+     * @return Cadena con la ruta absoluta del fichero seleccionado o null, en caso de que se cancele
+     * 
      */
-    public static String selectJsonFile(String initialDirectoryPath) {
-        // 1. Create the file chooser
-        JFileChooser fileChooser = new JFileChooser();
-        
-        // 2. Set the initial directory (if it exists)
-        if (initialDirectoryPath != null) {
-            File initialDir = new File(initialDirectoryPath);
-            if (initialDir.exists() && initialDir.isDirectory()) {
-                fileChooser.setCurrentDirectory(initialDir);
-            }
-        }
-        
-        // 3. Set a filter so the user only sees and selects .json files
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Configuration Files (*.json)", "json");
-        fileChooser.setFileFilter(filter);
-        fileChooser.setAcceptAllFileFilterUsed(false); // Disables the "All Files" option
-        
-        // 4. Show the "Open" dialog (null centers it on screen, or pass your JFrame)
-        int result = fileChooser.showOpenDialog(null);
-        
-        // 5. Process the user selection
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            return selectedFile.getAbsolutePath(); // Returns the selected path
-        }
-        
-        return null; // User closed or cancelled the dialog
+
+    public static String selectFile(String initialDirectoryPath) {
+
+    	JFileChooser fileChooser = new JFileChooser();
+
+    	if (initialDirectoryPath != null) {
+    		File initialDir = new File(initialDirectoryPath);
+    		if (initialDir.exists() && initialDir.isDirectory()) {
+    			fileChooser.setCurrentDirectory(initialDir);
+    		}
+    	}
+    	
+    	int result = fileChooser.showOpenDialog(null);
+    	
+    	if (result == JFileChooser.APPROVE_OPTION) {
+    		File selectedFile = fileChooser.getSelectedFile();
+    		return selectedFile.getAbsolutePath(); // Returns the selected path
+    	}
+    	
+    	return null; // el usuario ha cancelado la selección
     }
 }

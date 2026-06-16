@@ -1,0 +1,135 @@
+[
+  {
+    "task": "ObtenerRango",
+	"module":"tunit",
+	"description":"Obtiene un rango especificado",
+	"params": { 
+		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+		"range":{"type":"String","required":true,"description":"Rango a copiar"},
+		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
+		"newColInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Columna"}				
+		}
+  },
+  {
+    "task": "EliminarBlancos",
+	"module":"tunit",
+	"description":"Elimina las línea en blanco de un fichero",	
+	"params": { 
+		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"}
+	}
+  },
+  {
+    "task": "CambiarPatron",
+	"module":"tunit",
+	"description":"Cambia la cadena que coincide con un patrón dado por otro.",	
+	"params": { 
+		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
+				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"}	
+			  }
+  },
+  {
+    "task": "ObtenerFilasNMasX",
+	"module":"tunit",
+	"description":"Obtiene las filas N más las siguientes X posiciones",	
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}				
+			  }		
+  },
+  {
+    "task": "BorrarFilasNMasX",
+	"module":"tunit",
+	"description":"Borra las filas N más las siguientes X posiciones",	
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},		
+				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
+				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}			
+			  }		
+  },
+  {
+    "task": "ObtenerFilaColumnaContiene",
+	"module":"tunit",
+	"description":"Obtiene las filas que contengan, en las columnas especificadas, un texto en concreto",		
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}									
+			  }	
+  },
+  {
+    "task": "BorrarFilaColumnaContiene",
+	"module":"tunit",
+	"description":"Borra las filas que contengan, en las columnas especificadas, un texto en concreto",		
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
+				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
+				"mode":{"type":"Integer","required":false,"description":"Modo de busqueda modo=0 - palabra completa | modo=1  - contine el texto, en cualquier pos | modo=2 la col empieza por | modo=3 - la columna finaliza por. Por defecto se aplica el modo 0"}											
+			  }	
+  },
+  {
+    "task": "ObtieneFilasPosiciones",
+	"module":"tunit",
+	"description":"Obtiene las filas indicadas",		
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}		
+			  }	
+  },
+  {
+    "task": "BorrarFilasPosiciones",
+	"module":"tunit",
+	"description":"Borras las filas indicadas",			
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}		
+			  }	
+  },  
+  {
+    "task": "ObtieneColumnasPosiciones",
+	"description":"Obtiene las columnas de la lista de posiciones de columnas indicadas",			
+	"module":"tunit",
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},		
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}	
+			  }	
+  },
+  {
+    "task": "BorrarColumnasPosiciones",
+	"description":"Borra las columnas de la lista de posiciones de columnas indicadas",			
+	"module":"tunit",
+	"params": { 
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}			
+			  }	
+  },
+  {
+    "task": "DividirColumnaPatron",
+	"description":"Divide una columna según el patrón indicado",				
+  	"module":"tunit",
+  	"params": { 
+			"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},	
+  			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
+  			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}
+			  					
+  		  }
+  },  
+  {
+    "task": "UnirColumnasPatron",
+  	"module":"tunit",
+	"description":"Une varias columnas en una según un patrón indicado",				
+  	"params": { 
+  			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
+  			"positionNewColumn":{"type":"Integer","index":true,"required":false,"description":"Posición en la que ubicaremos la nueva columna. Si no se indica se posicionará al final, si se indica las columnas siguientes se deplazarán una columna. "},
+			"keepOriginalColumn":{"type":"Boolean","required":false,"description":"Se especifica si se mantendrá la columna original o se eliminará."},
+			"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con los numeros de fila, empezando por 1, en los que se aplicará la acción"},
+			"notFoundValue":{"type":"String","required":false,"description":"Valor que se pondrá en caso de no encontrarse el patrón, valor por defecto"}					
+  		  }
+  }  
+]

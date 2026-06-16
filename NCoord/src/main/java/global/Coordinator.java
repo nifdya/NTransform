@@ -43,7 +43,13 @@ public class Coordinator {
 			System.out.println(boundaryLayout);
 		}
 	}
-
+	
+	/**
+	 * Punto de entrada de la aplicación.
+	 * 
+	 * @param args Argumentos de la línea de comandos. Se recibe un argumento, el primero, es la ruta del fichero json con el pipeline.
+	 * 
+	 */
 	public static void main(String[] args) {
 		// El primer argumento es el nombre del fichero de secuencias que tiene que
 		// estar en formato json

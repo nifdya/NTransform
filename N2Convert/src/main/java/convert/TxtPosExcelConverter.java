@@ -1,6 +1,6 @@
 package convert;
 
-import com.github.pjfanning.xlsx.StreamingReader; // <-- LECTOR EN STREAMING DE GRANDES EXCEL
+import com.github.pjfanning.xlsx.StreamingReader; 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import java.io.*;
@@ -10,18 +10,35 @@ import java.util.Map;
 import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
+/**
+ * Clase para la conversión de ficheros Texto por posiciones al formato XSLX y viceversa
+ * 
+ * @version 1.0
+ */
 public class TxtPosExcelConverter {
 
+	/** Definiciones del fichero de texto por posiciones */
     private final Map<String, RecordDefinitionTextPos> mapaDefiniciones;
+    /** Charset del fichero de texto por posiciones */
     private final Charset charset;
-
+    
+	/**
+	 * Cargamos en el constructor el mapa de definiciones y el charset del fichero
+	 * 
+	 * @param mapaDefiniciones - Definiciones del fichero de texto por posiciones	
+	 * @param charset - Charset del fichero de texto por posiciones.
+	 */
     public TxtPosExcelConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset) {
         this.mapaDefiniciones = mapaDefiniciones;
         this.charset = charset;
     }
 
     /**
-     * PROCESO 3: TEXTO POSICIONAL -> EXCEL (.XLSX) OPTIMIZADO PARA GRANDES VOLÚMENES
+     * Método para la conversión de un fichero de texto por posiciones a XLSX
+     * 
+     * @param txtPath - Ruta del fichero de texto origen
+     * @param xlsxPath - Ruta del fichero destino xlsx, resultante de la conversión
+     * @throws IOException
      */
     public void txtPosToExcel(String txtPath, String xlsxPath) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
@@ -72,12 +89,16 @@ public class TxtPosExcelConverter {
             try (FileOutputStream fileOut = new FileOutputStream(xlsxPath)) {
                 workbook.write(fileOut);
             }
-            // Eliminado workbook.dispose() por estar deprecated (el try-with-resources se encarga)
+            // Eliminado workbook.dispose() por estar deprecated (el try-with-resources se encargará)
         }
     }
 
     /**
-     * PROCESO 4: EXCEL (.XLSX) -> TEXTO POSICIONAL OPTIMIZADO CONTRA ERRORES DE MEMORIA
+     * Método para la conversión de un fichero XLSX a un ficher de texto por posiciones 
+     * 
+     * @param xlsxPath - Ruta del fichero origen xlsx
+     * @param txtPath - Ruta del fichero de texto origen, resultante de la conversión
+     * @throws IOException
      */
     public void excelToTxtPos(String xlsxPath, String txtPath) throws IOException {
         // Abrimos el archivo a través de StreamingReader

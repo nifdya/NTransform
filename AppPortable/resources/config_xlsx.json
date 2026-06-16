@@ -2,7 +2,6 @@
   {
     "task": "CombinarHojas",
 	"module":"merge",
-	"description":"Obtiener un rango determinado del fichero",
     "params": { 
 		"header":{"type":"Boolean","required":false,"description":"Imprime los nombres de las hojas como cabecera en el siguiente grupo"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -13,7 +12,6 @@
   {
     "task": "ObtenerRango",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 		"range":{"type":"String","required":true,"description":"Rango a copiar"},
 		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
@@ -26,7 +24,6 @@
   {
     "task": "EliminarBlancos",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 	
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
 				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},
@@ -36,7 +33,6 @@
   {
     "task": "CambiarPatron",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
 				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"},
@@ -48,7 +44,6 @@
   {
     "task": "ObtenerFilasNMasX",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
 				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"},
@@ -60,7 +55,6 @@
   {
     "task": "BorrarFilasNMasX",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
 				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"},
@@ -72,7 +66,6 @@
   {
     "task": "ObtenerFilaColumnaContiene",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
@@ -85,7 +78,6 @@
   {
     "task": "BorrarFilaColumnaContiene",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
@@ -99,7 +91,6 @@
   {
     "task": "ObtieneFilasPosiciones",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -110,7 +101,6 @@
   {
     "task": "BorrarFilasPosiciones",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -121,7 +111,6 @@
   {
     "task": "ObtieneColumnasPosiciones",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -132,7 +121,6 @@
   {
     "task": "BorrarColumnasPosiciones",
 	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
 	"params": { 
 				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -143,7 +131,6 @@
   {
     "task": "DividirColumnaPatron",
   	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
   	"params": { 
   			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
   			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
@@ -159,7 +146,6 @@
   {
     "task": "UnirColumnasPatron",
   	"module":"tunit",
-	"description":"Obtiener un rango determinado del fichero",
   	"params": { 
   			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
   			"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},

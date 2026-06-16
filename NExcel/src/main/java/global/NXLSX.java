@@ -32,7 +32,6 @@ import tunit.UnitaryTransformations;
  * (CLI). Permite realizar diversas tareas como unir hojas o transformaciones
  * unitarias.
  * 
- * @author imc
  * @version 1.0
  */
 @Command(name = "nes-excel", mixinStandardHelpOptions = true, version = "1.0", description = "Nodo para la transformación Excel")
@@ -43,7 +42,7 @@ public class NXLSX implements Callable<Integer> {
 	@Option(names = { "-i", "--input" }, description = "Archivo de entrada")
 	private File inputFile;
 
-	/** Archivo de salid. */
+	/** Archivo de salida. */
 	@Option(names = { "-o", "--output" }, description = "Archivo de salida")
 	private File outputFile;
 

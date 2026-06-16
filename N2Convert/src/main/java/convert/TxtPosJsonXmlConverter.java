@@ -17,99 +17,135 @@ import org.w3c.dom.Element;
 import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
+/**
+ * Clase para la conversión de ficheros Texto por posiciones a los formatos
+ * estructurados JSON y XML.
+ * 
+ * @version 1.0
+ */
 public class TxtPosJsonXmlConverter {
 
-    private final Map<String, RecordDefinitionTextPos> mapaDefiniciones;
-    private final Charset charset;
+	/** Definiciones del fichero de texto por posiciones */
+	private final Map<String, RecordDefinitionTextPos> mapaDefiniciones;
+	/** Charset del fichero de texto por posiciones */
+	private final Charset charset;
 
-    public TxtPosJsonXmlConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset) {
-        this.mapaDefiniciones = mapaDefiniciones;
-        this.charset = charset;
-    }
+	/**
+	 * Cargamos en el constructor el mapa de definiciones y el charset del fichero
+	 * 
+	 * @param mapaDefiniciones - Definiciones del fichero de texto por posiciones	
+	 * @param charset - Charset del fichero de texto por posiciones.
+	 */
+	public TxtPosJsonXmlConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset) {
+		this.mapaDefiniciones = mapaDefiniciones;
+		this.charset = charset;
+	}
 
-    public void txtPosToJson(String txtPath, String jsonPath) throws IOException {
-        JsonFactory factory = new JsonFactory();
-        try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
-             JsonGenerator jg = factory.createGenerator(new File(jsonPath), com.fasterxml.jackson.core.JsonEncoding.UTF8)) {
-            
-            jg.useDefaultPrettyPrinter();
-            jg.writeStartArray();
+	/**
+	 * Método para la conversión de un fichero de texto por posiciones a JSON
+	 * 
+	 * @param txtPath - Ruta del fichero de texto origen
+	 * @param jsonPath - Ruta del fichero destino json, resultante de la conversión
+	 * @throws IOException
+	 */
+	public void txtPosToJson(String txtPath, String jsonPath) throws IOException {
+		JsonFactory factory = new JsonFactory();
+		try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
+				JsonGenerator jg = factory.createGenerator(new File(jsonPath),
+						com.fasterxml.jackson.core.JsonEncoding.UTF8)) {
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) continue;
+			jg.useDefaultPrettyPrinter();
+			jg.writeStartArray();
 
-                String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
-                RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
-                if (def == null) continue;
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.isEmpty())
+					continue;
 
-                List<Integer> longitudes = def.getLongitudes();
-                List<Boolean> ignorados = def.getIgnorados();
+				String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
+				RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
+				if (def == null)
+					continue;
 
-                jg.writeStartObject();
-                jg.writeStringField("recordType", tipo);
+				List<Integer> longitudes = def.getLongitudes();
+				List<Boolean> ignorados = def.getIgnorados();
 
-                int currentPointer = 0;
-                int fieldIdx = 0;
-                for (int i = 0; i < longitudes.size(); i++) {
-                    if (currentPointer >= line.length()) break;
-                    int length = longitudes.get(i);
-                    int endPointer = Math.min(currentPointer + length, line.length());
+				jg.writeStartObject();
+				jg.writeStringField("recordType", tipo);
 
-                    if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
-                        jg.writeStringField("p" + fieldIdx, line.substring(currentPointer, endPointer).trim());
-                        fieldIdx++;
-                    }
-                    currentPointer += length;
-                }
-                jg.writeEndObject();
-            }
-            jg.writeEndArray();
-        }
-    }
+				int currentPointer = 0;
+				int fieldIdx = 0;
+				for (int i = 0; i < longitudes.size(); i++) {
+					if (currentPointer >= line.length())
+						break;
+					int length = longitudes.get(i);
+					int endPointer = Math.min(currentPointer + length, line.length());
 
-    public void txtPosToXml(String txtPath, String xmlPath) throws Exception {
-        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        Element root = doc.createElement("records");
-        doc.appendChild(root);
+					if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
+						jg.writeStringField("p" + fieldIdx, line.substring(currentPointer, endPointer).trim());
+						fieldIdx++;
+					}
+					currentPointer += length;
+				}
+				jg.writeEndObject();
+			}
+			jg.writeEndArray();
+		}
+	}
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) continue;
+	/**
+	 * Método para la conversión de texto por posiciones a XML
+	 * 
+	 * @param txtPath - Ruta del fichero de texto origen
+	 * @param xmlPath - Ruta del fichero destino xml, resultante de la conversión	
+	 * 
+	 * @throws Exception
+	 */
+	public void txtPosToXml(String txtPath, String xmlPath) throws Exception {
+		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		Element root = doc.createElement("records");
+		doc.appendChild(root);
 
-                String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
-                RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
-                if (def == null) continue;
+		try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.isEmpty())
+					continue;
 
-                List<Integer> longitudes = def.getLongitudes();
-                List<Boolean> ignorados = def.getIgnorados();
+				String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
+				RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
+				if (def == null)
+					continue;
 
-                Element recordNode = doc.createElement("record");
-                recordNode.setAttribute("type", tipo);
+				List<Integer> longitudes = def.getLongitudes();
+				List<Boolean> ignorados = def.getIgnorados();
 
-                int currentPointer = 0;
-                int fieldIdx = 0;
-                for (int i = 0; i < longitudes.size(); i++) {
-                    if (currentPointer >= line.length()) break;
-                    int length = longitudes.get(i);
-                    int endPointer = Math.min(currentPointer + length, line.length());
+				Element recordNode = doc.createElement("record");
+				recordNode.setAttribute("type", tipo);
 
-                    if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
-                        Element fieldNode = doc.createElement("p" + fieldIdx);
-                        fieldNode.setTextContent(line.substring(currentPointer, endPointer).trim());
-                        recordNode.appendChild(fieldNode);
-                        fieldIdx++;
-                    }
-                    currentPointer += length;
-                }
-                root.appendChild(recordNode);
-            }
-        }
+				int currentPointer = 0;
+				int fieldIdx = 0;
+				for (int i = 0; i < longitudes.size(); i++) {
+					if (currentPointer >= line.length())
+						break;
+					int length = longitudes.get(i);
+					int endPointer = Math.min(currentPointer + length, line.length());
 
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty("{http://apache.org}indent-amount", "4");
-        transformer.transform(new DOMSource(doc), new StreamResult(new File(xmlPath)));
-    }
+					if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
+						Element fieldNode = doc.createElement("p" + fieldIdx);
+						fieldNode.setTextContent(line.substring(currentPointer, endPointer).trim());
+						recordNode.appendChild(fieldNode);
+						fieldIdx++;
+					}
+					currentPointer += length;
+				}
+				root.appendChild(recordNode);
+			}
+		}
+
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+		transformer.setOutputProperty("{http://apache.org}indent-amount", "4");
+		transformer.transform(new DOMSource(doc), new StreamResult(new File(xmlPath)));
+	}
 }

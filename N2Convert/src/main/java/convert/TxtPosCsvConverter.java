@@ -8,119 +8,161 @@ import java.util.Map;
 import record.MapDefinitionsTextPos; // Importamos el resolvedor centralizado
 import record.RecordDefinitionTextPos;
 
+/**
+ * Clase para la conversión de ficheros Texto por posiciones al formato CSV y
+ * viceversa
+ * 
+ * @version 1.0
+ */
 public class TxtPosCsvConverter {
+	/** Definiciones del fichero de texto por posiciones */
+	private final Map<String, RecordDefinitionTextPos> mapaDefiniciones;
+	/** Charset del fichero de texto por posiciones y el fichero CSV */
+	private final Charset charset;
+	/** Delimitador de las columnas CSV */
+	private final String delimiter;
 
-    private final Map<String, RecordDefinitionTextPos> mapaDefiniciones;
-    private final Charset charset;
-    private final String delimiter;
+	/**
+	 * Cargamos en el constructor el mapa de definiciones y el charset del fichero.
+	 * Si no se especifica el delimitador CSV, se utilizará este constructor que
+	 * usará, por defecto, el delimitador ";"
+	 * 
+	 * @param mapaDefiniciones - Definiciones del fichero de texto por posiciones
+	 * @param charset          - Charset del fichero de texto por posiciones y del
+	 *                         csv.
+	 */
+	public TxtPosCsvConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset) {
+		this(mapaDefiniciones, charset, ";");
+	}
 
-    public TxtPosCsvConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset) {
-        this(mapaDefiniciones, charset, ",");
-    }
+	/**
+	 * Cargamos en el constructor el mapa de definiciones y el charset del fichero.
+	 * 
+	 * @param mapaDefiniciones - Definiciones del fichero de texto por posiciones
+	 * @param charset          - Charset del fichero de texto por posiciones y del
+	 *                         csv.
+	 * @param delimiter        - Delimitador del fichero CSV.
+	 */
+	public TxtPosCsvConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset,
+			String delimiter) {
+		this.mapaDefiniciones = mapaDefiniciones;
+		this.charset = charset;
+		this.delimiter = delimiter;
+	}
 
-    public TxtPosCsvConverter(Map<String, RecordDefinitionTextPos> mapaDefiniciones, Charset charset, String delimiter) {
-        this.mapaDefiniciones = mapaDefiniciones;
-        this.charset = charset;
-        this.delimiter = delimiter;
-    }
+	/**
+	 * Convierte un fichero en formato de texto por posiciones a CSV.
+	 * 
+	 * @param txtPath - Ruta del fichero de texto origen.
+	 * @param csvPath - Ruta del fichero CSV destino, resultado de la conversión.
+	 * @throws IOException
+	 */
+	public void txtPosToCsv(String txtPath, String csvPath) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, charset))) {
 
-    /**
-     * PROCESO 1: TEXTO POSICIONAL -> CSV
-     */
-    public void txtPosToCsv(String txtPath, String csvPath) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(txtPath, charset));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(csvPath, charset))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.isEmpty())
+					continue;
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) continue;
+				// REUTILIZACIÓN GLOBAL: Invocamos de forma estática la lógica centralizada de
+				// tipado
+				String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
+				RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
+				if (def == null)
+					continue;
 
-                // REUTILIZACIÓN GLOBAL: Invocamos de forma estática la lógica centralizada de tipado
-                String tipo = MapDefinitionsTextPos.obtenerTipoDeLinea(line, this.mapaDefiniciones);
-                RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipo);
-                if (def == null) continue;
+				List<Integer> longitudes = def.getLongitudes();
+				List<Boolean> ignorados = def.getIgnorados();
+				List<String> tokens = new ArrayList<>();
+				int currentPointer = 0;
 
-                List<Integer> longitudes = def.getLongitudes();
-                List<Boolean> ignorados = def.getIgnorados();
-                List<String> tokens = new ArrayList<>();
-                int currentPointer = 0;
+				for (int i = 0; i < longitudes.size(); i++) {
+					if (currentPointer >= line.length())
+						break;
+					int length = longitudes.get(i);
+					int endPointer = Math.min(currentPointer + length, line.length());
 
-                for (int i = 0; i < longitudes.size(); i++) {
-                    if (currentPointer >= line.length()) break;
-                    int length = longitudes.get(i);
-                    int endPointer = Math.min(currentPointer + length, line.length());
+					if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
+						String value = line.substring(currentPointer, endPointer).trim();
+						if (value.contains(delimiter) || value.contains("\"")) {
+							value = "\"" + value.replace("\"", "\"\"") + "\"";
+						}
+						tokens.add(value);
+					}
+					currentPointer += length;
+				}
+				writer.write(String.join(delimiter, tokens));
+				writer.newLine();
+			}
+		}
+	}
 
-                    if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
-                        String value = line.substring(currentPointer, endPointer).trim();
-                        if (value.contains(delimiter) || value.contains("\"")) {
-                            value = "\"" + value.replace("\"", "\"\"") + "\"";
-                        }
-                        tokens.add(value);
-                    }
-                    currentPointer += length;
-                }
-                writer.write(String.join(delimiter, tokens));
-                writer.newLine();
-            }
-        }
-    }
+	/**
+	 * Convierte un fichero en formato CSV a texto por posiciones.
+	 * 
+	 * @param csvPath - Ruta del fichero CSV origen.
+	 * @param txtPath - Ruta del fichero de texto destino, resultado de la
+	 *                conversión.
+	 * @throws IOException
+	 */
+	public void csvToTxtPos(String csvPath, String txtPath) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, charset));
+				BufferedWriter writer = new BufferedWriter(new FileWriter(txtPath, charset))) {
 
-    /**
-     * PROCESO 2: CSV -> TEXTO POSICIONAL
-     */
-    public void csvToTxtPos(String csvPath, String txtPath) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvPath, charset));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(txtPath, charset))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.isEmpty())
+					continue;
 
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.isEmpty()) continue;
+				String[] columns = line.split(delimiter + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
 
-                String[] columns = line.split(delimiter + "(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-                
-                for (int i = 0; i < columns.length; i++) {
-                    if (columns[i].startsWith("\"") && columns[i].endsWith("\"")) {
-                        columns[i] = columns[i].substring(1, columns[i].length() - 1).replace("\"\"", "\"");
-                    }
-                }
+				for (int i = 0; i < columns.length; i++) {
+					if (columns[i].startsWith("\"") && columns[i].endsWith("\"")) {
+						columns[i] = columns[i].substring(1, columns[i].length() - 1).replace("\"\"", "\"");
+					}
+				}
 
-                // Identificamos el tipo mapeando de forma directa la primera columna del CSV estructurado
-                String tipoCsv = "default";
-                if (this.mapaDefiniciones.size() > 1 && columns.length > 0) {
-                    String tipoExtraido = columns[0].trim();
-                    if (this.mapaDefiniciones.containsKey(tipoExtraido)) {
-                        tipoCsv = tipoExtraido;
-                    }
-                }
+				// Identificamos el tipo mapeando de forma directa la primera columna del CSV
+				// estructurado
+				String tipoCsv = "default";
+				if (this.mapaDefiniciones.size() > 1 && columns.length > 0) {
+					String tipoExtraido = columns[0].trim();
+					if (this.mapaDefiniciones.containsKey(tipoExtraido)) {
+						tipoCsv = tipoExtraido;
+					}
+				}
 
-                RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipoCsv);
-                if (def == null) continue;
+				RecordDefinitionTextPos def = this.mapaDefiniciones.get(tipoCsv);
+				if (def == null)
+					continue;
 
-                List<Integer> longitudes = def.getLongitudes();
-                List<Boolean> ignorados = def.getIgnorados();
-                StringBuilder sbLine = new StringBuilder();
-                int csvColIdx = 0;
+				List<Integer> longitudes = def.getLongitudes();
+				List<Boolean> ignorados = def.getIgnorados();
+				StringBuilder sbLine = new StringBuilder();
+				int csvColIdx = 0;
 
-                for (int i = 0; i < longitudes.size(); i++) {
-                    int targetLen = longitudes.get(i);
-                    String rawValue = "";
+				for (int i = 0; i < longitudes.size(); i++) {
+					int targetLen = longitudes.get(i);
+					String rawValue = "";
 
-                    if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
-                        if (csvColIdx < columns.length) {
-                            rawValue = columns[csvColIdx].trim();
-                            csvColIdx++;
-                        }
-                    }
+					if (ignorados == null || i >= ignorados.size() || !ignorados.get(i)) {
+						if (csvColIdx < columns.length) {
+							rawValue = columns[csvColIdx].trim();
+							csvColIdx++;
+						}
+					}
 
-                    if (rawValue.length() > targetLen) {
-                        sbLine.append(rawValue.substring(0, targetLen));
-                    } else {
-                        sbLine.append(String.format("%-" + targetLen + "s", rawValue));
-                    }
-                }
-                sbLine.append(System.lineSeparator());
-                writer.write(sbLine.toString());
-            }
-        }
-    }
+					if (rawValue.length() > targetLen) {
+						sbLine.append(rawValue.substring(0, targetLen));
+					} else {
+						sbLine.append(String.format("%-" + targetLen + "s", rawValue));
+					}
+				}
+				sbLine.append(System.lineSeparator());
+				writer.write(sbLine.toString());
+			}
+		}
+	}
 }

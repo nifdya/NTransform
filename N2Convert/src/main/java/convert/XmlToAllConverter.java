@@ -9,19 +9,34 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import record.RecordDefinitionTextPos;
-
+/**
+ * Clase para la conversión de los ficheros de formato XML a cualquiera de los otros formatos.
+ * En estos momentos el resto de formatos (formatos destino) son: CSV, TXT por posiciones y XSLX
+ * 
+ * @version 1.0
+ */
 public class XmlToAllConverter {
 
     private final Charset charset;
-    private final String delimiter = ",";
+    private final String delimiter = ";";
 
+	/**
+	 * Constructor básico para conversiones que NO requieren posiciones fijas
+	 * 
+	 * @param charset - Charset a utilizar en los ficheros
+	 */
     public XmlToAllConverter(Charset charset) {
         this.charset = charset;
     }
 
+
     /**
-     * CONVERSIÓN INVERSA: XML -> TEXTO POSICIONAL 
-     * (Único método que requiere mapeo de longitudes físicas)
+     * Conversión de XML a Fichero de texto por posiciones. 
+     * 
+     * @param xmlPath - Ruta del fichero XML a convertir
+     * @param txtPath - Ruta del fichero TXT final, el fichero convertido
+     * @param mapaDefiniciones - Los ficheros TXT por posiciones requieren de un fichero de definiciones, en formato json
+     * @throws Exception
      */
     public void xmlToTxtPos(String xmlPath, String txtPath, Map<String, RecordDefinitionTextPos> mapaDefiniciones) throws Exception {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(xmlPath));
@@ -64,7 +79,11 @@ public class XmlToAllConverter {
     }
 
     /**
-     * CONVERSIÓN INVERSA: XML -> CSV (Estructura directa sin definiciones)
+     * Conversión de XML a CSV.
+     * 
+     * @param jsonPath - Ruta del fichero JSON a convertir.
+     * @param csvPath - Ruta del fichero CSV final, el fichero convertido. 
+     * @throws Exception
      */
     public void xmlToCsv(String xmlPath, String csvPath) throws Exception {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(xmlPath));
@@ -93,7 +112,11 @@ public class XmlToAllConverter {
     }
 
     /**
-     * CONVERSIÓN INVERSA: XML -> EXCEL (Estructura directa sin definiciones)
+     * Conversión de XML a formato XLSX.
+     * 
+     * @param xmlPath - Ruta del fichero XML a convertir.
+     * @param xlsxPath - Ruta del fichero xlsx final, el fichero convertido.
+     * @throws Exception
      */
     public void xmlToExcel(String xmlPath, String xlsxPath) throws Exception {
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File(xmlPath));

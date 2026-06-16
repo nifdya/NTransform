@@ -1,5 +1,10 @@
 package global.task;
-
+/**
+ * Clase para la interacción con Jackson para el parseo y trabajo con el fichero de configuración json
+ * En este caso, para el manejo de las opciones cmdOptionsConfig
+ * 
+ * @version 1.0
+ */
 public class CmdOptionsConfig {
 	private String name;
 	private boolean required;
@@ -7,7 +12,6 @@ public class CmdOptionsConfig {
 	private String option;
 	private Object defaultValue;
 	
-	// Getters y Setters
 	public String getName() {
 		return name;
 	}

@@ -16,13 +16,6 @@
 			<version>2.17.0</version>
 		</dependency>
 
-		<!-- Picocli: Para la interfaz de línea de comandos -->
-		<dependency>
-			<groupId>info.picocli</groupId>
-			<artifactId>picocli</artifactId>
-			<version>4.7.5</version>
-		</dependency>
-
 		<!-- Dependencia al proyecto de logs-->
 		<dependency>
 			<groupId>es.nesi</groupId>

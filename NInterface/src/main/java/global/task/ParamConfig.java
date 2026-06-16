@@ -1,10 +1,15 @@
 package global.task;
-
+/**
+ * Clase para la interacción con Jackson para el parseo y trabajo con el fichero de configuración json
+ * En este caso, para el manejo de los parametros a configurar en el json
+ * 
+ * @version 1.0
+ */
 public class ParamConfig {
     private String type;
     private boolean required;
     private String description;
-    private boolean index; // Por si procesas la propiedad "index" del JSON
+    private boolean index; 
 
     // Getters y Setters
     public String getType() { return type; }

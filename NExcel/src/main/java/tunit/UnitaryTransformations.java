@@ -7,8 +7,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import global.ExcelUtilRowMode;
-import global.ExcelUtils;
+import global.NXLSXUtilRowMode;
+import global.NXLSXUtils;
 import global.MasterOperation;
 import global.options.ComunOptions;
 import global.options.TaskOptions;
@@ -50,8 +50,8 @@ public class UnitaryTransformations extends MasterOperation {
 	 */
 	private void splitColumnsByRegexGroups(Row rowInput, Sheet outSheet, int currentRow,
 			java.util.regex.Pattern pattern) {
-		ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(rowInput, outSheet.createRow(currentRow++));
-		ExcelUtils.splitColumnsByRegexGroups(excelOpt, this.optsTask.get("sheetsPositions"), pattern,
+		NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(rowInput, outSheet.createRow(currentRow++));
+		NXLSXUtils.splitColumnsByRegexGroups(excelOpt, this.optsTask.get("sheetsPositions"), pattern,
 				this.optsTask.get("newValue"), this.optsTask.get("keepOriginalColumn"),
 				this.optsTask.get("notFoundValue"), fOut, styleMap);
 	}
@@ -64,8 +64,8 @@ public class UnitaryTransformations extends MasterOperation {
 	 * @param currentRow Índice de la fila actual
 	 */
 	private void joinColumnsByRegex(Row rowInput, Sheet outSheet, int currentRow) {
-		ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(rowInput, outSheet.createRow(currentRow++));
-		ExcelUtils.joinColumnsByRegex(excelOpt, this.optsTask.get("sheetsPositions"), this.optsTask.get("newValue"),
+		NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(rowInput, outSheet.createRow(currentRow++));
+		NXLSXUtils.joinColumnsByRegex(excelOpt, this.optsTask.get("sheetsPositions"), this.optsTask.get("newValue"),
 				this.optsTask.get("keepOriginalColumn"), this.optsTask.get("notFoundValue"), fOut, styleMap);
 	}
 
@@ -78,8 +78,8 @@ public class UnitaryTransformations extends MasterOperation {
 	 * @param currentRow Índice de la fila actual
 	 */
 	private void newRow(Row rowInput, Sheet outSheet, int currentRow) {
-		ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(rowInput, outSheet.createRow(currentRow++));
-		ExcelUtils.copyRow(excelOpt, fOut, styleMap);
+		NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(rowInput, outSheet.createRow(currentRow++));
+		NXLSXUtils.copyRow(excelOpt, fOut, styleMap);
 	}
 
 	/**
@@ -92,11 +92,11 @@ public class UnitaryTransformations extends MasterOperation {
 	 * @param pColumns   Posiciones a incluir o excluir
 	 */
 	private void newRow(Row rowInput, Sheet outSheet, int currentRow, Boolean include, Integer[] pColumns) {
-		ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(rowInput, outSheet.createRow(currentRow++));
+		NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(rowInput, outSheet.createRow(currentRow++));
 		if (include) {
-			ExcelUtils.fillRowWithPositions(excelOpt, pColumns, fOut, styleMap);
+			NXLSXUtils.fillRowWithPositions(excelOpt, pColumns, fOut, styleMap);
 		} else {
-			ExcelUtils.fillRowExcludingPositions(excelOpt, pColumns, fOut, styleMap);
+			NXLSXUtils.fillRowExcludingPositions(excelOpt, pColumns, fOut, styleMap);
 		}
 	}
 
@@ -111,9 +111,9 @@ public class UnitaryTransformations extends MasterOperation {
 	 * @param newValue   Nuevo valor en la sustitución
 	 */
 	private void newRowWithReplace(Row rowInput, Sheet outSheet, int currentRow, String oldValue, String newValue) {
-		ExcelUtilRowMode excelOpt = new ExcelUtilRowMode(rowInput, outSheet.createRow(currentRow++));
+		NXLSXUtilRowMode excelOpt = new NXLSXUtilRowMode(rowInput, outSheet.createRow(currentRow++));
 		excelOpt.setReplaceMode(oldValue, newValue);
-		ExcelUtils.copyRow(excelOpt, fOut, styleMap);
+		NXLSXUtils.copyRow(excelOpt, fOut, styleMap);
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class UnitaryTransformations extends MasterOperation {
 		Integer modeFilterContains=0;
 		switch (uTask) {
 		case EliminarBlancos:
-			if (!ExcelUtils.isRowEmpty(rowInput)) {
+			if (!NXLSXUtils.isRowEmpty(rowInput)) {
 				this.newRow(rowInput, outSheet, currentRow);
 				addRow = true;
 			}
@@ -159,7 +159,7 @@ public class UnitaryTransformations extends MasterOperation {
 			break;
 		case ObtenerFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
-			addRow = ExcelUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
+			addRow = NXLSXUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
 					this.optsTask.get("rowPositions"),modeFilterContains);
 			if (addRow) {
 				this.newRow(rowInput, outSheet, currentRow);
@@ -167,7 +167,7 @@ public class UnitaryTransformations extends MasterOperation {
 			break;
 		case BorrarFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
-			addRow = !(ExcelUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
+			addRow = !(NXLSXUtils.rowContainsListValues(rowInput, this.optsTask.get("rowText"),
 					this.optsTask.get("rowPositions"),modeFilterContains));
 			if (addRow) {
 				this.newRow(rowInput, outSheet, currentRow);
@@ -326,7 +326,7 @@ public class UnitaryTransformations extends MasterOperation {
 						CellRangeAddress range = CellRangeAddress.valueOf(this.optsTask.get("range"));
 						int rowOffset = -range.getFirstRow() + (int) this.optsTask.get("newRowInit") - 1;
 						int colOffset = -range.getFirstColumn() + (int) this.optsTask.get("newColInit") - 1;
-						ExcelUtils.copyRange(hojaOrigen, outSheet, range, rowOffset, colOffset, fOut, styleMap);
+						NXLSXUtils.copyRange(hojaOrigen, outSheet, range, rowOffset, colOffset, fOut, styleMap);
 					}
 				}
 			}
