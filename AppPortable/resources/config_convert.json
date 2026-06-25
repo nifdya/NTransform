@@ -11,8 +11,9 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"}
 		]
   },
   {
@@ -21,8 +22,9 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero csv"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},			
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"}
 		]
 	},
   {
@@ -31,9 +33,10 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT y CSV"},
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	},
   {
@@ -42,9 +45,10 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt y csv"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT y CSV"},
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	}, 
   {
@@ -53,8 +57,8 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	},
   {
@@ -63,8 +67,8 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	},
   {
@@ -73,8 +77,8 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	},
   {
@@ -83,8 +87,8 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+			{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 		]
 	},
   {
@@ -93,8 +97,9 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},	
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},					
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"}
 		]
 	},
   {
@@ -103,8 +108,9 @@
 	"params": { },
 	"cmdOptions": 
 		[
-			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"},			
-			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"}
+			{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"},
+			{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},											
+			{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"}
 		]
 	},
   {
@@ -126,26 +132,27 @@
 		"params": { },
 		"cmdOptions": 
 			[
-				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-				{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones CSV (Obligatorio)"}
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+				{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}
 			]
 	},
 	{
 	 	"task": "JSON2CSV",
-		"description":"Convierte el fichero de JSON a TXT",
+		"description":"Convierte el fichero de JSON a CSV",
 		"params": { },
 		"cmdOptions": 
 			[
-				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"},
+				{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},															
+				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"}			
 			]
 	},
 
 	 {
-	   "task": "JSON2XSLX",
-	"description":"Convierte el fichero de JSON a XLSX",
-	"params": { },
-	"cmdOptions": [	]
+	    "task": "JSON2XSLX",
+		"description":"Convierte el fichero de JSON a XLSX",
+		"params": { },
+		"cmdOptions": [	]
 	},
 	{
 	 	"task": "XML2TXT",
@@ -153,18 +160,19 @@
 		"params": { },
 		"cmdOptions": 
 			[
-				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero TXT"},
+				{"name":"fdefinitions","option":"-d","required":true,"defaultValue":"", "description":"Fichero con las definiciones de las posiciones del fichero TXT (Obligatorio)"}		
 			]
 	},	
 	{
 	 	"task": "XML2CSV",
-		"description":"Convierte el fichero de XML a TXT",
+		"description":"Convierte el fichero de XML a CSV",
 		"params": { },
 		"cmdOptions": 
 			[
-				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero txt"},
-				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el csv"}			
+				{"name":"charset","option":"-c","required":false,"defaultValue":"UTF-8", "description":"Charset del fichero CSV"},
+				{"name":"firstLineHeaders","option":"-f","required":false,"defaultValue":true, "description":"La primera fila incluye el nombre de las columnas del fichero CSV"},				
+				{"name":"delimiter","option":"-dc","required":false,"defaultValue":";", "description":"Separador de columnas en el CSV"}			
 			]
 	},
 	{

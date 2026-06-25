@@ -19,17 +19,18 @@ import java.util.Map;
  * @version 1.0
  */
 public class DynamicFormPanel extends JPanel {
-	/** Parámetros de la tarea, según el fichero de configuración*/
+	/** Parámetros de la tarea, según el fichero de configuración */
 	private final Map<String, ParamConfig> paramsConfig;
-	/** Opciones de comando de la tarea*/
+	/** Opciones de comando de la tarea */
 	private final ArrayList<CmdOptionsConfig> cmdOptions;
 
-	/** Componentes para las opciones de parámetros y opciones de comandos*/
+	/** Componentes para las opciones de parámetros y opciones de comandos */
 	private final Map<String, JComponent> fieldsMap = new HashMap<>();
 	private final Map<String, JComponent> fieldsOptMap = new HashMap<>();
 
 	/**
-	 * Constructor de la clase 
+	 * Constructor de la clase
+	 * 
 	 * @param task - Tarea con la configuración a cargar
 	 */
 	public DynamicFormPanel(TaskConfig task) {
@@ -41,14 +42,13 @@ public class DynamicFormPanel extends JPanel {
 		buildForm();
 	}
 
-
 	private int buildFormParams(GridBagConstraints gbc, int row) {
 		for (Map.Entry<String, ParamConfig> entry : paramsConfig.entrySet()) {
 			String paramName = entry.getKey();
 			ParamConfig prop = entry.getValue();
 			String desc = prop.getDescription() != null ? prop.getDescription() : "";
 
-			// Etiqueta con Tooltip 
+			// Etiqueta con Tooltip
 			gbc.gridx = 0;
 			gbc.gridy = row;
 			gbc.weightx = 0.3;
@@ -76,7 +76,7 @@ public class DynamicFormPanel extends JPanel {
 
 			String desc = cmdConfig.getDescription() != null ? cmdConfig.getDescription() : "";
 
-			// 1. Etiqueta con Tooltip (Punto 2)
+			// 1. Etiqueta con Tooltip
 			gbc.gridx = 0;
 			gbc.gridy = row;
 			gbc.weightx = 0.3;
@@ -85,12 +85,15 @@ public class DynamicFormPanel extends JPanel {
 			label.setToolTipText(desc); // Asigna el tooltip a la etiqueta
 			add(label, gbc);
 
-			// 2. Componente de entrada con Tooltip (Punto 2)
+			// 2. Componente de entrada con Tooltip
 			gbc.gridx = 1;
 			gbc.weightx = 0.7;
 			JComponent component = null;
+
 			if (paramName.equals("charset")) {
 				component = createComponentForType("Charset", desc);
+			} else if (paramName.equals("firstLineHeaders")) {
+				component = createComponentForType("Boolean", desc);
 			} else {
 				component = createComponentForType("String", desc);
 			}
@@ -140,7 +143,9 @@ public class DynamicFormPanel extends JPanel {
 
 	/**
 	 * Valida el formulario del panel
-	 * @return Boolean - true, si pasa las validaciones | false, en caso que no pase las validaciones
+	 * 
+	 * @return Boolean - true, si pasa las validaciones | false, en caso que no pase
+	 *         las validaciones
 	 */
 	public boolean validateForm() {
 		boolean isValid = true;
@@ -258,12 +263,12 @@ public class DynamicFormPanel extends JPanel {
 		return isValid;
 	}
 
-
 	/**
 	 * Devuelve los parámetros formateados en formato clave=valor unidos por
 	 * tuberías.
 	 * 
-	 * @return Cadena con los parametros serializados. Ej:  "ObtenerFilaColumnaContiene|rowPositions=1;2;3;4|rowText=b112;a111;a112"
+	 * @return Cadena con los parametros serializados. Ej:
+	 *         "ObtenerFilaColumnaContiene|rowPositions=1;2;3;4|rowText=b112;a111;a112"
 	 */
 	public String getSerializedParams() {
 		StringBuilder sb = new StringBuilder();
@@ -310,6 +315,7 @@ public class DynamicFormPanel extends JPanel {
 		return config.getOption();
 
 	}
+
 	/**
 	 * Devuelve las opciones de comando para la tarea serializadas
 	 * 

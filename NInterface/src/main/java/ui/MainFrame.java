@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -83,6 +84,7 @@ public class MainFrame extends JFrame {
 	 */
 	private JTextField txtDefFile, txtDelimiter;
 	private JComboBox<String> cmbCharset;
+	private JCheckBox checkFirstLineHeaders;
 
 	/**
 	 * Tabla y colección persistente de instrucciones, donde muestra el grid con las
@@ -211,9 +213,9 @@ public class MainFrame extends JFrame {
 		gbc.weightx = 0.0;
 		JButton btnBrowseDestino = new JButton("...");
 		btnBrowseDestino.addActionListener(e -> {
-			String path = FileSelectorManager.selectFile(UtilsFileSystem.getJarPath());
+			String path = FileSelectorManager.saveFile(UtilsFileSystem.getJarPath());
 			if (path != null) {
-				txtDestino.setText(path); // Esto disparará automáticamente el listener de arriba
+				txtDestino.setText(path); // Esto disparará automáticamente el listener 
 			}
 		});
 		fieldsPanel.add(btnBrowseDestino, gbc);
@@ -404,6 +406,12 @@ public class MainFrame extends JFrame {
 				jsonHeaderFieldsPanel.add(new JLabel("Charset:"));
 				cmbCharset = CharsetCombo.createCharsetCombo();
 				jsonHeaderFieldsPanel.add(cmbCharset);
+				
+				checkFirstLineHeaders = new JCheckBox("Incluye cabeceras en primera línea:");
+				jsonHeaderFieldsPanel.add(checkFirstLineHeaders);
+				
+				
+
 				break;
 
 			case "config_text.json":
@@ -621,16 +629,13 @@ public class MainFrame extends JFrame {
 					"Validación de Datos", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		// --> Creamos un selector de archivos nativo de Swing
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Guardar Configuración de Pipeline Final");
-		fileChooser.setSelectedFile(new File("pipeline_final.json"));
-
-		int userSelection = fileChooser.showSaveDialog(this);
-
+		// --> Creamos un selector de archivos 
+		
+		String pipelinePath = FileSelectorManager.saveFile(null, "pipeline_final.json", "Guardar Configuración de Pipeline Final", "json");
+		
 		// --> Si el usuario confirma la ruta y pulsa "Guardar"
-		if (userSelection == JFileChooser.APPROVE_OPTION) {
-			File fileToSave = fileChooser.getSelectedFile();
+		if (pipelinePath != null) {
+			File fileToSave = new File(pipelinePath);
 			try {
 				// --> Construir el nodo raíz del JSON
 				ObjectNode rootNode = objectMapper.createObjectNode();
