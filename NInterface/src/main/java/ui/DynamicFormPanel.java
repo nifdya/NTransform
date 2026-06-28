@@ -2,6 +2,8 @@ package ui;
 
 import javax.swing.*;
 
+import global.FileSelectorManager;
+import global.UtilsFileSystem;
 import global.task.CmdOptionsConfig;
 import global.task.ParamConfig;
 import global.task.TaskConfig;
@@ -94,6 +96,8 @@ public class DynamicFormPanel extends JPanel {
 				component = createComponentForType("Charset", desc);
 			} else if (paramName.equals("firstLineHeaders")) {
 				component = createComponentForType("Boolean", desc);
+			} else if (paramName.equals("fdefinitions")) {
+				component = createComponentForType("File", desc);
 			} else {
 				component = createComponentForType("String", desc);
 			}
@@ -136,6 +140,8 @@ public class DynamicFormPanel extends JPanel {
 			return new JTextField(20);
 		case "Charset":
 			return CharsetCombo.createCharsetCombo();
+	    case "File":
+	        return FileSelectorManager.createFileSelectorComponent(null);			
 		default:
 			return new JTextField(20);
 		}

@@ -4,7 +4,7 @@
 	"module":"tunit",
 	"description":"Elimina las línea en blanco de un fichero",	
 	"params": { 
-		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"}
+		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"}		
 	}
   },
   {
@@ -12,7 +12,7 @@
 	"module":"tunit",
 	"description":"Cambia la cadena que coincide con un patrón dado por otro.",	
 	"params": { 
-		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
+				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
 				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
 				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"}	
 			  }

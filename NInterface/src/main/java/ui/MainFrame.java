@@ -416,8 +416,10 @@ public class MainFrame extends JFrame {
 
 			case "config_text.json":
 				jsonHeaderFieldsPanel.add(new JLabel("Fichero de definiciones:"));
-				txtDefFile = new JTextField(20);
-				jsonHeaderFieldsPanel.add(txtDefFile);
+				/*txtDefFile = new JTextField(20);
+				jsonHeaderFieldsPanel.add(txtDefFile);*/
+
+				jsonHeaderFieldsPanel.add(FileSelectorManager.createFileSelectorComponent("txtDefFile"));
 
 				jsonHeaderFieldsPanel.add(new JLabel("Charset:"));
 				cmbCharset = CharsetCombo.createCharsetCombo();

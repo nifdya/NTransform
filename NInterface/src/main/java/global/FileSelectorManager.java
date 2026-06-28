@@ -1,9 +1,14 @@
 package global;
 
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileFilter;
 
+import java.awt.BorderLayout;
 import java.io.File;
 /**
  * Clase par la gestión de un selector de ficheros
@@ -155,5 +160,28 @@ public class FileSelectorManager {
 			return absolutePath;
 		}
 		return null;
+	}
+	public static JComponent createFileSelectorComponent(String txtName) {
+	    JPanel panel = new JPanel(new BorderLayout(5, 0)); // 5 píxeles de separación horizontal
+	    JTextField txtOrigen = new JTextField(20);
+	    JButton btnBrowseOrigen = new JButton("...");
+
+	    btnBrowseOrigen.addActionListener(e -> {
+	        String path = FileSelectorManager.selectFile(UtilsFileSystem.getJarPath());
+	        if (path != null) {
+	            txtOrigen.setText(path);
+	        }
+	    });
+	    if(txtName!=null)
+	    {	    	
+	    	txtOrigen.setName(txtName); 
+	    }
+	    panel.add(txtOrigen, BorderLayout.CENTER);
+	    
+	    panel.add(btnBrowseOrigen, BorderLayout.EAST);
+	   
+	    panel.setName("fileSelectorPanel"); 
+	    
+	    return panel;
 	}
 }
