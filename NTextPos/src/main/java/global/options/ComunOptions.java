@@ -5,15 +5,13 @@ import java.io.BufferedWriter;
 import java.util.List;
 
 /**
- * Opciones comunes de entrada a todas las operaciones del módulo.
- * Centraliza los descriptores de archivos nativos y la metadata del XML.
+ * Opciones comunes de entrada a todas las operaciones del módulo. Centraliza
+ * los descriptores de archivos nativos y la metadata del XML.
  */
 public class ComunOptions {
 
 	private BufferedReader inputFile;
 	private BufferedWriter outputFile;
-	
-
 
 	public BufferedReader getInputFile() {
 		return inputFile;

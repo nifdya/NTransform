@@ -21,7 +21,6 @@ import record.RecordDefinitionTextPos;
  * CSV, XLSX (Excel), and fixed-width positional text files (TXT).
  * </p>
  * 
- * @author es.nesi
  * @version 1.0
  * @since 2026-06-13
  */
@@ -154,7 +153,11 @@ public class Convert implements Callable<Integer> {
 	        Convert.printModuleLog("📥 Fichero Inicial:" + in, false);
 	        Convert.printModuleLog("📤 Fichero Final:  " + out, false);
 	        Convert.printModuleLog("📌 Tarea:  " + task, false);
-	        if(this.delimiterCSV!=null)
+	        if(task==Task.CSV2JSON || task==Task.CSV2TXT 
+	          || task==Task.CSV2XLSX || task==Task.CSV2XML
+	          || task==Task.XLSX2CSV || task==Task.TXT2CSV
+	          || task==Task.JSON2CSV || task==Task.XML2CSV
+	          )
 	        {
 	        	Convert.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiterCSV+"'", false);	        	
 	        }

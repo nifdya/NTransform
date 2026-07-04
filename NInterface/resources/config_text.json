@@ -2,7 +2,7 @@
   {
     "task": "EliminarBlancos",
 	"module":"tunit",
-	"description":"Elimina las línea en blanco de un fichero",	
+	"description":"Elimina las líneas en blanco de un fichero",	
 	"params": { 
 		"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"}		
 	}
@@ -10,7 +10,7 @@
   {
     "task": "CambiarPatron",
 	"module":"tunit",
-	"description":"Cambia la cadena que coincide con un patrón dado por otro.",	
+	"description":"Reemplaza el contenido de un patrón dado",	
 	"params": { 
 				"type":{"type":"ListString","required":false,"description":"Indica el listado de tipos a los que se le aplicará la tarea. Si no se indica, se aplicará a todos"},
 				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},

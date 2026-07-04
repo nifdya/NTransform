@@ -8,15 +8,17 @@ import es.nesi.NLog;
  * Clase principal que actúa como nodo coordinador para la ejecución de la
  * secuencia de transformadores.
  * 
- * @author imartinez.cerda
  * @version 1.0
  */
 public class Coordinator {
+
 	/**
-	 * Prints structured module message output directly to the system console tracks.
+	 * Prints structured module message output directly to the system console
+	 * tracks.
 	 * 
 	 * @param message Target alphanumeric text to log.
-	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 * @param isError Switch flag determining if log hits standard stream
+	 *                {@code false} or error stream {@code true}.
 	 */
 	public static void printModuleLog(String message, Boolean isError) {
 		if (isError) {
@@ -27,10 +29,13 @@ public class Coordinator {
 	}
 
 	/**
-	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * Prints a decorative operational separation line boundary across system IO
+	 * channels.
 	 * 
-	 * @param isError    Switch flag mapping targeted output straight to error streams.
-	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 * @param isError      Switch flag mapping targeted output straight to error
+	 *                     streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new
+	 *                     line skip when {@code true}.
 	 */
 	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
 		String boundaryLayout = "====================================================================================================";
@@ -43,11 +48,12 @@ public class Coordinator {
 			System.out.println(boundaryLayout);
 		}
 	}
-	
+
 	/**
 	 * Punto de entrada de la aplicación.
 	 * 
-	 * @param args Argumentos de la línea de comandos. Se recibe un argumento, el primero, es la ruta del fichero json con el pipeline.
+	 * @param args Argumentos de la línea de comandos. Se recibe un argumento, el
+	 *             primero, es la ruta del fichero json con el pipeline.
 	 * 
 	 */
 	public static void main(String[] args) {
@@ -58,7 +64,8 @@ public class Coordinator {
 		try {
 			// Activamos el sistema de logs, y generemoa un fichero con el mismo nombre del
 			// orquestador
-			NLog.activate(PathUtils.replaceExtension(args[0], "txt"));
+			String traceFile = PathUtils.replaceExtension(args[0], "txt");
+			NLog.activate(traceFile);
 
 			// INICIAMOS
 			Coordinator.printModuleLog("Cargando archivo de instrucciones JSON...", false);
@@ -69,7 +76,7 @@ public class Coordinator {
 			Coordinator.printModuleLog("Iniciamos el orquestador", false);
 			// Ejecutar el orquestador
 			CoordExecutor executor = new CoordExecutor();
-			executor.executePipeline(config);
+			executor.executePipeline(config, traceFile);
 
 		} catch (Exception e) {
 			Coordinator.printModuleLogSpace(true, false);

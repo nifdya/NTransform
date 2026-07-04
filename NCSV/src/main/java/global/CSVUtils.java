@@ -101,6 +101,18 @@ public class CSVUtils {
         }
         return false;
     }
+    public static boolean rowContainsListStr(CSVRecord record, String[] valuesStr, Integer[] positions, int mode) {
+        if (record == null || valuesStr == null) return false;
+        
+        for (int pos : positions) {
+            for (String valueStr : valuesStr) {
+                if (columnContains(record, pos, valueStr, mode)) {
+                    return true; // Encontró al menos una coincidencia
+                }
+            }
+        }
+        return false;
+    }
 
     // --- Versión 5: Fila completa (todas las columnas) vs Valor único ---
     public static boolean rowContains(CSVRecord record, String valueStr, int mode) {

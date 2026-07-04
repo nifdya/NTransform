@@ -2,7 +2,7 @@
   {
     "task": "EliminarBlancos",
 	"module":"tunit",
-	"description":"Elimina las columnas en blanco",
+	"description":"Elimina las líneas en blanco",
 	"params": { }
   },
   {

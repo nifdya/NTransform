@@ -62,7 +62,7 @@ public class DynamicFormPanel extends JPanel {
 			// Componente de entrada con Tooltip (Punto 2)
 			gbc.gridx = 1;
 			gbc.weightx = 0.7;
-			JComponent inputComponent = createComponentForType(prop.getType(), desc);
+			JComponent inputComponent = createComponentForType(prop.getType(), desc, paramName);
 			inputComponent.setToolTipText(desc); // Asigna el tooltip al campo de entrada
 			add(inputComponent, gbc);
 
@@ -93,13 +93,13 @@ public class DynamicFormPanel extends JPanel {
 			JComponent component = null;
 
 			if (paramName.equals("charset")) {
-				component = createComponentForType("Charset", desc);
+				component = createComponentForType("Charset", desc, paramName);
 			} else if (paramName.equals("firstLineHeaders")) {
-				component = createComponentForType("Boolean", desc);
+				component = createComponentForType("Boolean", desc, paramName);
 			} else if (paramName.equals("fdefinitions")) {
-				component = createComponentForType("File", desc);
+				component = createComponentForType("File", desc, paramName);
 			} else {
-				component = createComponentForType("String", desc);
+				component = createComponentForType("String", desc, paramName);
 			}
 			component.setToolTipText(desc); // Asigna el tooltip al campo de entrada
 			add(component, gbc);
@@ -124,7 +124,7 @@ public class DynamicFormPanel extends JPanel {
 
 	}
 
-	private JComponent createComponentForType(String type, String description) {
+	private JComponent createComponentForType(String type, String description, String name) {
 		switch (type) {
 		case "Boolean":
 			return new JCheckBox("Activar");
@@ -140,8 +140,8 @@ public class DynamicFormPanel extends JPanel {
 			return new JTextField(20);
 		case "Charset":
 			return CharsetCombo.createCharsetCombo();
-	    case "File":
-	        return FileSelectorManager.createFileSelectorComponent(null);			
+		case "File":
+			return FileSelectorManager.createFileSelectorComponent(name);
 		default:
 			return new JTextField(20);
 		}
@@ -180,6 +180,9 @@ public class DynamicFormPanel extends JPanel {
 				value = ((JSpinner) comp).getValue().toString();
 			} else if (comp instanceof JCheckBox) {
 				value = ((JCheckBox) comp).isSelected() ? "true" : "false";
+			} else if (comp instanceof JComponent) {
+				// el textobox esta incluido dentro (para selectores)
+				value = ((JTextField) comp).getText().trim();
 			}
 
 			// Validación de los campos obligatorios
@@ -251,6 +254,9 @@ public class DynamicFormPanel extends JPanel {
 					value = ((JSpinner) comp).getValue().toString();
 				} else if (comp instanceof JCheckBox) {
 					value = ((JCheckBox) comp).isSelected() ? "true" : "false";
+				} else if (comp instanceof JComponent) {
+					// el textobox esta incluido dentro (para selectores)
+					value = FileSelectorManager.getFilePathFromComponent(comp, paramName);
 				}
 
 				// Valida los campos obligatorios
@@ -293,6 +299,9 @@ public class DynamicFormPanel extends JPanel {
 				val = num > 0 ? String.valueOf(num) : "";
 			} else if (comp instanceof JTextField) {
 				val = ((JTextField) comp).getText().trim();
+			} else if (comp instanceof JComponent) {
+				// el textobox esta incluido dentro (para selectores)
+				val = FileSelectorManager.getFilePathFromComponent(comp, param);
 			}
 
 			if (val != null && !val.isEmpty()) {
@@ -344,6 +353,9 @@ public class DynamicFormPanel extends JPanel {
 				val = num > 0 ? String.valueOf(num) : "";
 			} else if (comp instanceof JTextField) {
 				val = ((JTextField) comp).getText().trim();
+			} else if (comp instanceof JComponent) {
+				// el textobox esta incluido dentro (para selectores)
+				val = FileSelectorManager.getFilePathFromComponent(comp, param);
 			}
 
 			if (val != null && !val.isEmpty()) {

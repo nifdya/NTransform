@@ -9,6 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileFilter;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.File;
 /**
  * Clase par la gestión de un selector de ficheros
@@ -161,6 +162,17 @@ public class FileSelectorManager {
 		}
 		return null;
 	}
+	public static String getFilePathFromComponent(JComponent selectorComponent, String txtName) {
+	    if (selectorComponent instanceof JPanel) {
+	        for (Component child : selectorComponent.getComponents()) {
+	            if (child instanceof JTextField && txtName.equals(child.getName())) {
+	                return ((JTextField) child).getText();
+	            }
+	        }
+	    }
+	    return "";
+	}
+
 	public static JComponent createFileSelectorComponent(String txtName) {
 	    JPanel panel = new JPanel(new BorderLayout(5, 0)); // 5 píxeles de separación horizontal
 	    JTextField txtOrigen = new JTextField(20);

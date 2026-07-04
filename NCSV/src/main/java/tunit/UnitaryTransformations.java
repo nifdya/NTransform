@@ -67,7 +67,7 @@ public class UnitaryTransformations {
 			break;
 		case ObtenerFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
-			addRow = CSVUtils.rowContains(rowInput, this.optsTask.get("rowText"),
+			addRow = CSVUtils.rowContainsListStr(rowInput, this.optsTask.get("rowText"),
 					this.optsTask.get("rowPositions"),modeFilterContains);
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
@@ -75,7 +75,7 @@ public class UnitaryTransformations {
 			break;
 		case BorrarFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
-			addRow = !(CSVUtils.rowContains(rowInput, this.optsTask.get("rowText"),
+			addRow = !(CSVUtils.rowContainsListStr(rowInput, this.optsTask.get("rowText"),
 					this.optsTask.get("rowPositions"),modeFilterContains));
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
@@ -107,7 +107,6 @@ public class UnitaryTransformations {
 			break;
 		}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			addRow=false;
 		}
@@ -131,6 +130,7 @@ public class UnitaryTransformations {
 			return true;
 
 		} catch (Exception e) {
+			System.err.println(e);
 			return false;
 
 		}

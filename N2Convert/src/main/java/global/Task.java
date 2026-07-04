@@ -1,5 +1,9 @@
 package global;
-
+/**
+ * Enumerado con las tareas implementadas en este módulo
+ * 
+ * @version 1.0
+ */
 public enum Task {XLS2XLSX, 
 					CSV2XLSX, 
 					XLSX2CSV,

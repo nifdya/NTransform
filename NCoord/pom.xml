@@ -5,9 +5,12 @@
 	<groupId>es.nesi</groupId>
 	<artifactId>NCoord</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.release>21</maven.compiler.release>
+  </properties>	
 	<dependencies>
-
-
 		<!-- Jackson Databind: La librería principal para convertir JSON a
 		Objetos -->
 		<dependency>

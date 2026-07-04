@@ -2,6 +2,7 @@
   {
     "task": "CombinarHojas",
 	"module":"merge",
+	"description":"Permite combinar las hojas de un excel",
     "params": { 
 		"header":{"type":"Boolean","required":false,"description":"Imprime los nombres de las hojas como cabecera en el siguiente grupo"},
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
@@ -12,6 +13,7 @@
   {
     "task": "ObtenerRango",
 	"module":"tunit",
+	"description":"Obtiene el rango dado",	
 	"params": { 
 		"range":{"type":"String","required":true,"description":"Rango a copiar"},
 		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
@@ -24,7 +26,7 @@
   {
     "task": "EliminarBlancos",
 	"module":"tunit",
-	"description":"Elimina las columnas en blanco",
+	"description":"Elimina las líneas en blanco",
 	"params": { 	
 				"otherSheetsAction":{"type":"String","required":false,"description":"Si se indica sheetsPositions o sheetsName, podemos indicar en este valor que realizar con las excluidas. Valores posibles: E (excluir del nuevo fichero) I (incorporar al mismo fichero), por defecto se incorporan"},
 				"sheetsPositions":{"type":"ListInteger","index":true,"required":false,"description":"Listado de posiciones de las hojas, empezado por 1, en las que se aplicará la acción."},

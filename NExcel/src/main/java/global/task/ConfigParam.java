@@ -7,7 +7,7 @@ package global.task;
 public class ConfigParam {
 	/** El tipo indicado en el json al parámetro */
     private TypeParam type;
-    /** Si el parámetro es requerido */
+	/** Si el parámetro es requerido */
     private boolean required;
     /** Si el parámetro contiene un índice */
     private boolean index;
