@@ -1,21 +1,14 @@
 [
   {
-    "task": "ObtenerRango",
-	"module":"tunit",
-	"params": { 
-		"range":{"type":"String","required":true,"description":"Rango a copiar"},
-		"newRowInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Fila"},
-		"newColInit":{"type":"Integer","required":false,"description":"Nueva posición inicial del Rango - Columna"}				
-		}
-  },
-  {
     "task": "EliminarBlancos",
 	"module":"tunit",
+	"description":"Elimina las líneas en blanco",
 	"params": { }
   },
   {
     "task": "CambiarPatron",
 	"module":"tunit",
+	"description":"Reemplaza el contenido de un patrón dado",	
 	"params": { 
 				"oldValue":{"type":"String","required":true,"description":"Cadena o patrón a cambiar"},
 				"newValue":{"type":"String","required":true,"description":"Cadena o patrón a dejar"}	
@@ -24,6 +17,7 @@
   {
     "task": "ObtenerFilasNMasX",
 	"module":"tunit",
+	"description":"Obtiene cada X filas",
 	"params": { 
 				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
 				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}				
@@ -32,6 +26,7 @@
   {
     "task": "BorrarFilasNMasX",
 	"module":"tunit",
+	"description":"Elimina cada X filas",
 	"params": { 
 				"N":{"type":"Integer","required":true,"description":"Posicion de inicio."},
 				"X":{"type":"Integer","required":true,"description":"N + pos inicio a borrar sucesivamente. N  es el primer número que tiene que será válido"}			
@@ -40,6 +35,7 @@
   {
     "task": "ObtenerFilaColumnaContiene",
 	"module":"tunit",
+	"description":"Obtienen las filas cuyas columnas contengan la cadena buscada",	
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna a comprobar. Si no se especifica, buscará en toda la fila"},
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
@@ -49,6 +45,7 @@
   {
     "task": "BorrarFilaColumnaContiene",
 	"module":"tunit",
+	"description":"Borra las filas que contengan, en las columnas especificadas, un texto en concreto",	
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":false,"description":"Enteros con las posiciones de la columna, empezando por 0, a comprobar. Si no se especifica, buscará en toda la fila"},
 				"rowText":{"type":"ListString","required":true,"description":"Cadena de búsqueda"},
@@ -58,12 +55,14 @@
   {
     "task": "ObtieneFilasPosiciones",
 	"module":"tunit",
+	"description":"Obtiene las filas indicadas",	
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}		
 			  }	
   },
   {
     "task": "BorrarFilasPosiciones",
+	"description":"Borras las filas indicadas",	
 	"module":"tunit",
 	"params": { 
 				"rowPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}		
@@ -71,6 +70,7 @@
   },  
   {
     "task": "ObtieneColumnasPosiciones",
+	"description":"Obtiene las columnas de la lista de posiciones de columnas indicadas",	
 	"module":"tunit",
 	"params": { 
 				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila a obtener, empezando por 1 a borrar"}	
@@ -79,6 +79,7 @@
   {
     "task": "BorrarColumnasPosiciones",
 	"module":"tunit",
+	"description":"Borra las columnas de la lista de posiciones de columnas indicadas",	
 	"params": { 
 				"colPositions":{"type":"ListInteger","index":true,"required":true,"description":"Enteros con los numeros de fila, empezando por 1 a borrar"}			
 			  }	
@@ -86,6 +87,7 @@
   {
     "task": "DividirColumnaPatron",
   	"module":"tunit",
+	"description":"Divide una columna según el patrón indicado",	
   	"params": { 
   			"originalPattern":{"type":"Pattern","required":true,"description":"Patrón de la columna a dividir"},
   			"newValue":{"type":"ListString","required":true,"description":"Patrón de la(s) columna(s) divididas "},
@@ -98,6 +100,7 @@
   {
     "task": "UnirColumnasPatron",
   	"module":"tunit",
+	"description":"Une varias columnas en una según un patrón indicado",		
   	"params": { 
   			"newValue":{"type":"String","required":true,"description":"Patrón de los objetos a unirse"},
   			"positionNewColumn":{"type":"Integer","index":true,"required":false,"description":"Posición en la que ubicaremos la nueva columna. Si no se indica se posicionará al final, si se indica las columnas siguientes se deplazarán una columna. "},
