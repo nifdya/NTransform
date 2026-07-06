@@ -342,7 +342,6 @@ public class UnitaryTransformations extends MasterOperation {
 	 * Punto de entrada de la clase
 	 */
 	public XSSFWorkbook doTask(XSSFWorkbook fIn) {
-
 		switch (uTask) {
 		case ObtenerRango:
 			this.getOutputRange(fIn);

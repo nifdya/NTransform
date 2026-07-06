@@ -15,7 +15,9 @@ import global.options.ComunOptions;
 import global.options.TaskOptions;
 import global.task.Task;
 import record.RecordDefinition; // Importamos el contenedor
-
+/**
+ * Clase principal para la gestión de las tareas unitarias del módulo
+ */
 public class UnitaryTransformations {
 
 	private Task uTask;
@@ -252,6 +254,7 @@ public class UnitaryTransformations {
 	}
 
 	public Boolean doTask() {
+		Boolean result=false;
 		switch (uTask) {
 			case ObtenerRango:
 				break;
@@ -266,11 +269,11 @@ public class UnitaryTransformations {
 			case ObtieneColumnasPosiciones:
 			case BorrarColumnasPosiciones:
 			case DividirColumnaPatron:			
-				this.getOutputFileCheckByRow();
+				result=this.getOutputFileCheckByRow();
 				break;
 			default:
 				break;
 		}
-		return true;
+		return result;
 	}
 }

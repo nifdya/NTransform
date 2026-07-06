@@ -140,11 +140,8 @@ public class UnitaryTransformations {
 
 
 	public Boolean doTask() {
-
+		Boolean result=false;
 		switch (uTask) {
-		case ObtenerRango:
-			//this.getOutputRange(fIn);
-			break;
 		case CambiarPatron:
 		case EliminarBlancos:
 		case ObtenerFilasNMasX:
@@ -155,12 +152,12 @@ public class UnitaryTransformations {
 		case ObtieneColumnasPosiciones:
 		case BorrarColumnasPosiciones:
 		case DividirColumnaPatron:			
-			this.getOutputFileCheckByRow();
+			result=this.getOutputFileCheckByRow();
 			break;
 		default:
 			break;
 		}
-		return true;
+		return result;
 
 	}
 }

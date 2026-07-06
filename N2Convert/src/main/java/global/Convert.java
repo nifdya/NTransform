@@ -14,11 +14,12 @@ import record.MapDefinitionsTextPos;
 import record.RecordDefinitionTextPos;
 
 /**
- * Universal format transformation module.
+ * Módulo de transformación de formato universal.
  * <p>
- * This class implements a command-line interface (CLI) application using Picocli
- * to orchestrate file conversions between multiple formats including JSON, XML,
- * CSV, XLSX (Excel), and fixed-width positional text files (TXT).
+ * Esta clase implementa una aplicación de interfaz de línea de comandos (CLI)
+ * utilizando Picocli para orquestar conversiones de archivos entre múltiples
+ * formatos, incluyendo JSON, XML, CSV, XLSX (Excel) y archivos de texto
+ * posicional de ancho fijo (TXT).
  * </p>
  * 
  * @version 1.0
@@ -28,110 +29,119 @@ import record.RecordDefinitionTextPos;
 public class Convert implements Callable<Integer> {
 
 	/**
-	 * Target input file to be processed.
+	 * Fichero de entrada a procesar
 	 */
 	@Option(names = { "-i", "--input" }, required = true, description = "Ruta del archivo de entrada.")
 	private File inputFile;
 
 	/**
-	 * Output file destination where results will be stored.
+	 * Fichero de salida que almacenará los resultados
 	 */
 	@Option(names = { "-o", "--output" }, required = true, description = "Ruta del archivo de salida.")
 	private File outputFile;
 
 	/**
-	 * Configuration file containing XML specifications for fixed-width positional files.
+	 * Fichero con las especificaciones JSON para ficheros delimitados por
+	 * posiciones
 	 */
-	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones JSON para el procesamiento de los ficheros de tipo de Ancho Fijo.")
+	@Option(names = { "-d",
+			"--fdefinitions" }, description = "Fichero con las definiciones JSON para el procesamiento de los ficheros de tipo de Ancho Fijo.")
 	private String defFile;
 
 	/**
-	 * Transformation task strategy to execute.
+	 * Tarea a ejecutar
 	 */
 	@Option(names = { "-t", "--task" }, description = "Operación. Valores: ${COMPLETION-CANDIDATES}", required = true)
 	private Task task;
 
 	/**
-	 * Text encoding character set used during reading and writing operations.
+	 * Codificación de carácteres del fichero a trabajar
 	 */
 	@Option(names = { "-c", "--charset" }, description = "Codificación (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
-	
+
 	/**
-	 * Character sequence used to separate structural values within CSV operations.
+	 * Caracter delimitador de columanas para ficheros CSV
 	 */
-	@Option(names = { "-dc", "--delimiter" }, description = "Delimitador de elementos csv, por defecto ';'", defaultValue = ";")
+	@Option(names = { "-dc",
+			"--delimiter" }, description = "Delimitador de elementos csv, por defecto ';'", defaultValue = ";")
 	private String delimiterCSV;
-	
+
 	/**
-	 * 
+	 * Ruta del fichero de traza
 	 */
 	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "")
 	private String trace;
 
 	/**
-	 * Routes JSON structures into concrete data outputs based on the assigned task strategy.
+	 * Enruta estructuras JSON hacia salidas de datos concretas según la estrategia
+	 * de la tarea asignada.
 	 * 
-	 * @param inputPathStr  Absolute path mapping the target input source.
-	 * @param outputPathStr Absolute path mapping the output destination.
-	 * @param charset       Character encoding framework applied to data writing streams.
-	 * @throws IOException If underlying converter fails to write or access file structures.
+	 * @param inputPathStr  Ruta absoluta que mapea la fuente de entrada de destino.
+	 * @param outputPathStr Ruta absoluta que mapea el destino de la salida.
+	 * @param charset       Marco de codificación de caracteres aplicado a los
+	 *                      flujos de escritura de datos.
+	 * @throws IOException Si el convertidor subyacente falla al escribir o acceder
+	 *                     a las estructuras de archivos.
 	 */
-	private void convertJson2X(String inputPathStr, String outputPathStr, Charset charset) throws IOException
-	{
+	private void convertJson2X(String inputPathStr, String outputPathStr, Charset charset) throws IOException {
 		JsonToAllConverter jsonInverter = new JsonToAllConverter(charset);
 		switch (task) {
-	    case JSON2TXT:
-	        jsonInverter.jsonToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
-	        break;
-	    case JSON2CSV:
-	        jsonInverter.jsonToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
-	        break;
-	    case JSON2XLSX:
-	        jsonInverter.jsonToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
-	        break;
+		case JSON2TXT:
+			jsonInverter.jsonToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
+			break;
+		case JSON2CSV:
+			jsonInverter.jsonToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
+			break;
+		case JSON2XLSX:
+			jsonInverter.jsonToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
+			break;
 
 		default:
 			break;
 		}
-		
+
 	}
-	
+
 	/**
-	 * Routes XML structures into concrete data outputs based on the assigned task strategy.
+	 * Enruta estructuras XML hacia salidas de datos concretas según la estrategia
+	 * de la tarea asignada.
 	 * 
-	 * @param inputPathStr  Absolute path mapping the target input source.
-	 * @param outputPathStr Absolute path mapping the output destination.
-	 * @param charset       Character encoding framework applied to data writing streams.
-	 * @throws Exception If XML processing node resolution yields parsing faults.
+	 * @param inputPathStr  Ruta absoluta que mapea la fuente de entrada de destino.
+	 * @param outputPathStr Ruta absoluta que mapea el destino de la salida.
+	 * @param charset       Marco de codificación de caracteres aplicado a los
+	 *                      flujos de escritura de datos.
+	 * @throws Exception Si la resolución de nodos del procesamiento XML genera
+	 *                   fallos de análisis (parsing).
 	 */
-	private void convertXml2X(String inputPathStr, String outputPathStr, Charset charset) throws Exception
-	{
-		XmlToAllConverter xmlInverter = new XmlToAllConverter(charset);	
+	private void convertXml2X(String inputPathStr, String outputPathStr, Charset charset) throws Exception {
+		XmlToAllConverter xmlInverter = new XmlToAllConverter(charset);
 		switch (task) {
-	    case XML2TXT:
-	        xmlInverter.xmlToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
-	        break;
-	    case XML2CSV:
-	        xmlInverter.xmlToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
-	        break;
-	    case XML2XLSX:
-	        xmlInverter.xmlToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
-	        break;
+		case XML2TXT:
+			xmlInverter.xmlToTxtPos(inputPathStr, outputPathStr, MapDefinitionsTextPos.getDefinitions(this.defFile));
+			break;
+		case XML2CSV:
+			xmlInverter.xmlToCsv(inputPathStr, outputPathStr); // Limpio de dependencias XML
+			break;
+		case XML2XLSX:
+			xmlInverter.xmlToExcel(inputPathStr, outputPathStr); // Limpio de dependencias XML
+			break;
 		}
 	}
-	
+
 	/**
-	 * Execution core for the transformation logic. Intercepts CLI parameters,
-	 * prints module structural diagnostics, and routes format processing schemas.
+	 * Núcleo de ejecución para la lógica de transformación. Intercepta los
+	 * parámetros de la CLI, imprime diagnósticos estructurales del módulo y enruta
+	 * los esquemas de procesamiento de formato.
 	 * 
-	 * @return {@code 0} upon successful translation pipeline termination, {@code 1} on file absence or processing failures.
+	 * @return {@code 0} tras la terminación exitosa de la canalización de
+	 *         traducción, {@code 1} en caso de ausencia de archivos o fallos de
+	 *         procesamiento.
 	 */
 	@Override
 	public Integer call() {
 		try {
-			if(this.trace!=null && this.trace!="")
-			{
+			if (this.trace != null && this.trace != "") {
 				NLog.activate(trace);
 			}
 			if (!inputFile.exists()) {
@@ -148,25 +158,19 @@ public class Convert implements Callable<Integer> {
 			Map<String, RecordDefinitionTextPos> mapDefs = (this.defFile != null)
 					? MapDefinitionsTextPos.getDefinitions(this.defFile)
 					: null;
-	        Convert.printModuleLogSpace(false, true);
-	        Convert.printModuleLog("🚀 Iniciando Conversión -->", false);
-	        Convert.printModuleLog("📥 Fichero Inicial:" + in, false);
-	        Convert.printModuleLog("📤 Fichero Final:  " + out, false);
-	        Convert.printModuleLog("📌 Tarea:  " + task, false);
-	        if(task==Task.CSV2JSON || task==Task.CSV2TXT 
-	          || task==Task.CSV2XLSX || task==Task.CSV2XML
-	          || task==Task.XLSX2CSV || task==Task.TXT2CSV
-	          || task==Task.JSON2CSV || task==Task.XML2CSV
-	          )
-	        {
-	        	Convert.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiterCSV+"'", false);	        	
-	        }
-	        if(cs!=null)
-	        {
-	        	Convert.printModuleLog("🔤 Charset:  " + cs, false);	        	
-	        }
-	        Convert.printModuleLogSpace(false, false);
-			
+			Convert.printModuleLogSpace(false, true);
+			Convert.printModuleLog("🚀 Iniciando Conversión -->", false);
+			Convert.printModuleLog("📥 Fichero Inicial:" + in, false);
+			Convert.printModuleLog("📤 Fichero Final:  " + out, false);
+			Convert.printModuleLog("📌 Tarea:  " + task, false);
+			if (task == Task.CSV2JSON || task == Task.CSV2TXT || task == Task.CSV2XLSX || task == Task.CSV2XML
+					|| task == Task.XLSX2CSV || task == Task.TXT2CSV || task == Task.JSON2CSV || task == Task.XML2CSV) {
+				Convert.printModuleLog("⚙️ Delimitador CSV:'" + this.delimiterCSV + "'", false);
+			}
+			if (cs != null) {
+				Convert.printModuleLog("🔤 Charset:  " + cs, false);
+			}
+			Convert.printModuleLogSpace(false, false);
 
 			switch (task) {
 			case XLS2XLSX:
@@ -208,29 +212,29 @@ public class Convert implements Callable<Integer> {
 			case XLSX2XML:
 				ExcelJsonXmlConverter.excelToXml(in, out);
 				break;
-				// INVERSAS DESDE JSON
-		    case JSON2TXT:
-		    case JSON2CSV:
-		    case JSON2XLSX:
-		    	this.convertJson2X(in, out, cs);
-		        break;
+			// INVERSAS DESDE JSON
+			case JSON2TXT:
+			case JSON2CSV:
+			case JSON2XLSX:
+				this.convertJson2X(in, out, cs);
+				break;
 
-		    // INVERSAS DESDE XML
-		    case XML2TXT:
-		    case XML2CSV:
-		    case XML2XLSX:
-		    	this.convertXml2X(in, out, cs);
-		        break;
+			// INVERSAS DESDE XML
+			case XML2TXT:
+			case XML2CSV:
+			case XML2XLSX:
+				this.convertXml2X(in, out, cs);
+				break;
 			}
-	        Convert.printModuleLogSpace(false, true);
-	        Convert.printModuleLog("🚀 ¡Operación completada con éxito!", false);
-	        Convert.printModuleLogSpace(false, false);
+			Convert.printModuleLogSpace(false, true);
+			Convert.printModuleLog("🚀 ¡Operación completada con éxito!", false);
+			Convert.printModuleLogSpace(false, false);
 
 			return 0;
 
 		} catch (Exception e) {
 			Convert.printModuleLogSpace(true, true);
-			Convert.printModuleLog("❌ Error en la transformación: " + e.getMessage(),false);
+			Convert.printModuleLog("❌ Error en la transformación: " + e.getMessage(), false);
 			e.printStackTrace();
 			Convert.printModuleLogSpace(true, false);
 			return 1;
@@ -238,21 +242,24 @@ public class Convert implements Callable<Integer> {
 	}
 
 	/**
-	 * Main application bootstrap mechanism. Dispatches parameter parsing to Picocli framework.
+	 * Punto de entrada de la aplicación
 	 * 
-	 * @param args Application terminal runtime arguments.
+	 * @param args parámetros introducidos por la línea de comandos
 	 */
 	public static void main(String[] args) {
 		CommandLine cmd = new CommandLine(new Convert());
 		cmd.setCaseInsensitiveEnumValuesAllowed(true);
 		System.exit(cmd.execute(args));
 	}
-	
+
 	/**
-	 * Prints structured module message output directly to the system console tracks.
+	 * Imprime la salida de mensajes estructurados del módulo directamente en las
+	 * vías de la consola del sistema.
 	 * 
-	 * @param message Target alphanumeric text to log.
-	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 * @param message Texto alfanumérico de destino a registrar.
+	 * @param isError Bandera de conmutación que determina si el registro se dirige
+	 *                al flujo estándar {@code false} o al flujo de errores
+	 *                {@code true}.
 	 */
 	public static void printModuleLog(String message, Boolean isError) {
 		if (isError) {
@@ -263,10 +270,13 @@ public class Convert implements Callable<Integer> {
 	}
 
 	/**
-	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * Imprime una línea divisoria operativa decorativa a través de los canales de
+	 * E/S del sistema.
 	 * 
-	 * @param isError    Switch flag mapping targeted output straight to error streams.
-	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 * @param isError      Bandera de conmutación que mapea la salida de destino
+	 *                     directamente a los flujos de errores.
+	 * @param addLineBreak Antepone un salto de línea operativo a la secuencia de la
+	 *                     línea de diseño cuando es {@code true}.
 	 */
 	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
 		String boundaryLayout = "====================================================================================================";

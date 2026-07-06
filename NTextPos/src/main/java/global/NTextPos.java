@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,76 +26,89 @@ import picocli.CommandLine.Option;
 import tunit.UnitaryTransformations;
 import record.RecordDefinition;
 
+/**
+ * Clase principal que actúa como nodo de transformación para archivos de texto
+ * delimitados por posiciones. Utiliza la librería Picocli para gestionar la
+ * interfaz de línea de comandos (CLI). Permite realizar diversas
+ * transformaciones unitarias.
+ * 
+ */
 public class NTextPos implements Callable<Integer> {
 
+	/** Archivo de entrada. */
 	@Option(names = { "-i", "--input" }, description = "Archivo de entrada")
 	private String inputFile;
 
+	/** Archivo de salida. */
 	@Option(names = { "-o", "--output" }, description = "Archivo de salida")
 	private String outputFile;
 
+	/** Fichero de definiciones, para obtener las características del fichero */
 	@Option(names = { "-d", "--fdefinitions" }, description = "Fichero con las definiciones en formato JSON")
 	private String defFile;
 
+	/** Listado de tareas a ejecutar */
 	@Option(names = { "-t", "--task" }, description = "Tarea y su configuración")
 	private List<String> listTaskInCommand;
 
-	@Option(names = { "-c", "--charset" }, description = "Codificación de caracteres (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
+	/** Juego de caracteres del fichero de entrada y salida */
+	@Option(names = { "-c",
+			"--charset" }, description = "Codificación de caracteres (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
+
 	/**
-	 * 
+	 * Fichero de traza
 	 */
 	@Option(names = { "-ft", "--trace" }, description = "Fichero de traza, parámetro opcional", defaultValue = "log")
-	private String trace;	
-	
+	private String trace;
+
 	private Map<String, RecordDefinition> mapaDefiniciones = new HashMap<>();
 
-	
-
-
 	private void initializeDefinitions() {
-	    try {
-	        // Instanciamos el mapeador de Jackson
-	        ObjectMapper mapper = new ObjectMapper();
-	        
-	        // Leemos el archivo JSON directamente a un árbol de nodos astuto
-	        JsonNode rootNode = mapper.readTree(new File(this.defFile));
-	        
-	        // Obtenemos la lista de "records" (equivalente a doc.getElementsByTagName("record"))
-	        JsonNode records = rootNode.path("definitions");
+		try {
+			// Instanciamos el mapeador de Jackson
+			ObjectMapper mapper = new ObjectMapper();
 
-	        if (records.isArray()) {
-	            for (JsonNode record : records) {
-	                
-	                // Extraemos atributos/propiedades (si no existen, path() devuelve un nodo vacío seguro)
-	                String type = record.path("type").asText(null);
-	                int posType = record.path("posType").asInt(0);
-	                int lengthType = record.path("length").asInt(0);
+			// Leemos el archivo JSON directamente a un árbol de nodos astuto
+			JsonNode rootNode = mapper.readTree(new File(this.defFile));
 
-	                // CLAVE ÚNICA: Conservamos tu lógica exacta de "default" si viene vacío
-	                String claveMap = (type != null && !type.isEmpty()) ? type : "default";
+			// Obtenemos la lista de "records" (equivalente a
+			// doc.getElementsByTagName("record"))
+			JsonNode records = rootNode.path("definitions");
 
-	                // Instanciamos tu objeto de definición original sin tocar tu clase Java
-	                RecordDefinition def = new RecordDefinition(claveMap, posType, lengthType);
+			if (records.isArray()) {
+				for (JsonNode record : records) {
 
-	                // Procesamos el array interno de "fields"
-	                JsonNode fields = record.path("fields");
-	                if (fields.isArray()) {
-	                    for (JsonNode field : fields) {
-	                        int length = field.path("length").asInt();
-	                        boolean ignore = field.path("ignore").asBoolean(false);
-	                        
-	                        def.addField(length, ignore);
-	                    }
-	                }
+					// Extraemos atributos/propiedades (si no existen, path() devuelve un nodo vacío
+					// seguro)
+					String type = record.path("type").asText(null);
+					int posType = record.path("posType").asInt(0);
+					int lengthType = record.path("length").asInt(0);
 
-	                // Guardamos en tu mapa existente
-	                this.mapaDefiniciones.put(claveMap, def);
-	            }
-	        }
-	    } catch (Exception e) {
-	        throw new RuntimeException("Error cargando JSON: " + e.getMessage(), e);
-	    }
+					// CLAVE ÚNICA: Conservamos tu lógica exacta de "default" si viene vacío
+					String claveMap = (type != null && !type.isEmpty()) ? type : "default";
+
+					// Instanciamos tu objeto de definición original sin tocar tu clase Java
+					RecordDefinition def = new RecordDefinition(claveMap, posType, lengthType);
+
+					// Procesamos el array interno de "fields"
+					JsonNode fields = record.path("fields");
+					if (fields.isArray()) {
+						for (JsonNode field : fields) {
+							int length = field.path("length").asInt();
+							boolean ignore = field.path("ignore").asBoolean(false);
+
+							def.addField(length, ignore);
+						}
+					}
+
+					// Guardamos en tu mapa existente
+					this.mapaDefiniciones.put(claveMap, def);
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error cargando JSON: " + e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -111,14 +122,17 @@ public class NTextPos implements Callable<Integer> {
 	}
 
 	/**
-	 * Evalúa dinámicamente una línea de texto para determinar a qué tipo de registro pertenece.
-	 * Si no se encuentra una coincidencia específica, devuelve el registro por defecto ("DEFAULT").
+	 * Evalúa dinámicamente una línea de texto para determinar a qué tipo de
+	 * registro pertenece. Si no se encuentra una coincidencia específica, devuelve
+	 * el registro por defecto ("DEFAULT").
 	 */
 	public RecordDefinition determinarDefinicionParaLinea(String linea) {
-		// Buscamos si existe un registro base para usar sus coordenadas de tipado de forma genérica
+		// Buscamos si existe un registro base para usar sus coordenadas de tipado de
+		// forma genérica
 		RecordDefinition baseDef = this.mapaDefiniciones.get("default");
 		if (baseDef == null && !this.mapaDefiniciones.isEmpty()) {
-			// Si no hay un "DEFAULT" explícito, tomamos el primero disponible para inspeccionar la posición del tipo
+			// Si no hay un "DEFAULT" explícito, tomamos el primero disponible para
+			// inspeccionar la posición del tipo
 			baseDef = this.mapaDefiniciones.values().iterator().next();
 		}
 
@@ -137,30 +151,31 @@ public class NTextPos implements Callable<Integer> {
 		return this.mapaDefiniciones.get("default");
 	}
 
+	/**
+	 * Función de entrada principal para la ejecución
+	 */
 	@Override
 	public Integer call() {
 		try {
-			if(this.trace!=null && this.trace!="")
-			{
+			if (this.trace != null && this.trace != "") {
 				NLog.activate(trace);
 			}
-			if (this.listTaskInCommand == null || this.listTaskInCommand.isEmpty())
-			{				
+			if (this.listTaskInCommand == null || this.listTaskInCommand.isEmpty()) {
 				return 1;
 			}
 			NTextPos.printModuleLogSpace(false, true);
 			NTextPos.printModuleLog("🚀 Iniciando Tratamiento del fichero de texto por posiciones -->", false);
 			NTextPos.printModuleLog("📥 Fichero Inicial:" + this.inputFile, false);
 			NTextPos.printModuleLog("📥 Fichero de definiciones:" + this.defFile, false);
-			NTextPos.printModuleLog("🔤 Charset:  " + this.charsetName, false);	  			
+			NTextPos.printModuleLog("🔤 Charset:  " + this.charsetName, false);
 			NTextPos.printModuleLog("📤 Fichero Final:  " + this.outputFile, false);
 			NTextPos.printModuleLogSpace(false, false);
-			
+
 			// 1. Cargamos la estructura del archivo XML
 			this.initializeDefinitions();
 
 			File currentInput = new File(this.inputFile);
-			
+
 			// 2. Bucle secuencial de ejecución por pasadas temporales
 			for (int i = 0; i < this.listTaskInCommand.size(); i++) {
 				String iTask = this.listTaskInCommand.get(i);
@@ -185,42 +200,51 @@ public class NTextPos implements Callable<Integer> {
 				java.nio.charset.Charset charset = java.nio.charset.Charset.forName(this.charsetName);
 
 				try (BufferedReader reader = new BufferedReader(new FileReader(currentInput, charset));
-				     BufferedWriter writer = new BufferedWriter(new FileWriter(nextOutput, charset))) {
+						BufferedWriter writer = new BufferedWriter(new FileWriter(nextOutput, charset))) {
 
-				    ComunOptions opt = this.createOptionsObject(reader, writer);
+					ComunOptions opt = this.createOptionsObject(reader, writer);
 
-				    if ("tunit".equals(optTask.getModule())) {
-				        UnitaryTransformations ut = new UnitaryTransformations(currentTask, opt, optTask, this.mapaDefiniciones);
-				        ut.doTask();
-				    }
+					if ("tunit".equals(optTask.getModule())) {
+						UnitaryTransformations ut = new UnitaryTransformations(currentTask, opt, optTask,
+								this.mapaDefiniciones);
+						ut.doTask();
+					}
 				}
-
 
 				currentInput = nextOutput;
 			}
 			NTextPos.printModuleLogSpace(false, true);
-			NTextPos.printModuleLog("🚀 ¡Operación completada con éxito! Fichero generado correctamente en:" + this.outputFile, false);
-			NTextPos.printModuleLogSpace(false, false);	
+			NTextPos.printModuleLog(
+					"🚀 ¡Operación completada con éxito! Fichero generado correctamente en:" + this.outputFile, false);
+			NTextPos.printModuleLogSpace(false, false);
 			return 0;
 
 		} catch (Exception e) {
 			NTextPos.printModuleLogSpace(true, false);
 			NTextPos.printModuleLog("❌ Error fatal al general el nuevo fichero posicional: " + e.getMessage(), true);
 			e.printStackTrace();
-			NTextPos.printModuleLogSpace(true, false);				
+			NTextPos.printModuleLogSpace(true, false);
 			return 1;
 		}
 	}
 
+	/**
+	 * Función de entrada de la clase
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		int exitCode = new CommandLine(new NTextPos()).execute(args);
 		System.exit(exitCode);
 	}
+
 	/**
-	 * Prints structured module message output directly to the system console tracks.
+	 * Prints structured module message output directly to the system console
+	 * tracks.
 	 * 
 	 * @param message Target alphanumeric text to log.
-	 * @param isError Switch flag determining if log hits standard stream {@code false} or error stream {@code true}.
+	 * @param isError Switch flag determining if log hits standard stream
+	 *                {@code false} or error stream {@code true}.
 	 */
 	public static void printModuleLog(String message, Boolean isError) {
 		if (isError) {
@@ -231,10 +255,13 @@ public class NTextPos implements Callable<Integer> {
 	}
 
 	/**
-	 * Prints a decorative operational separation line boundary across system IO channels.
+	 * Prints a decorative operational separation line boundary across system IO
+	 * channels.
 	 * 
-	 * @param isError    Switch flag mapping targeted output straight to error streams.
-	 * @param addLineBreak Prefixes the layout line sequence with an operational new line skip when {@code true}.
+	 * @param isError      Switch flag mapping targeted output straight to error
+	 *                     streams.
+	 * @param addLineBreak Prefixes the layout line sequence with an operational new
+	 *                     line skip when {@code true}.
 	 */
 	public static void printModuleLogSpace(Boolean isError, Boolean addLineBreak) {
 		String boundaryLayout = "====================================================================================================";

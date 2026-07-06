@@ -60,7 +60,7 @@ public class CSV implements Callable<Integer> {
 	@Option(names = { "-t", "--task" }, description = "Tarea y su configuración (tarea:param=valor;param2=valor2)")
 	List<String> listTaskInCommand;
 
-
+	/** Juego de caracteres del fichero de entrada y salida */
 	@Option(names = { "-c", "--charset" }, description = "Codificación (UTF-8, ISO-8859-1...)", defaultValue = "UTF-8")
 	private String charsetName;
 	
@@ -141,6 +141,10 @@ public class CSV implements Callable<Integer> {
 	    }
 	    return format;
 	}
+	
+	/**
+	 * Función de entrada principal para la ejecución
+	 */
 	@Override
 	public Integer call() {
 		try {
@@ -225,6 +229,11 @@ public class CSV implements Callable<Integer> {
 		}
 	}
 
+	/**
+	 * Función de entrada de la clase
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		int exitCode = new CommandLine(new CSV()).execute(args);
 		System.exit(exitCode);
