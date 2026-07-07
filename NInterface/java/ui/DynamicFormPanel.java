@@ -141,7 +141,7 @@ public class DynamicFormPanel extends JPanel {
 		case "Charset":
 			return CharsetCombo.createCharsetCombo();
 		case "File":
-			return FileSelectorManager.createFileSelectorComponent(name);
+			return FileSelectorManager.createFileSelectorComponent(name,"contSelP_"+name);
 		default:
 			return new JTextField(20);
 		}

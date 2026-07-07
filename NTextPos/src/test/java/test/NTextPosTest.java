@@ -66,7 +66,7 @@ class NTextPosTest {
 	        CommandLine cmd = new CommandLine(nTextPos);
 
 	        // Tu argumento de comando real exacto
-	        String taskArgument = "ObtenerFilaColumnaContiene|rowPositions=1|rowText=03|mode=0";
+	        String taskArgument = "ObtenerFilaColumnaContiene|colPositions=1|rowText=03|mode=0";
 	        String traceFile = tempDir.resolve("traza_xlsx.txt").toString();
 
 	        // Ejecutamos la simulación del comando completo a través de Picocli

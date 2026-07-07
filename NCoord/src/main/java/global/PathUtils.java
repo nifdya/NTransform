@@ -6,9 +6,13 @@ package global;
 
 public class PathUtils {
 
+
 	/**
 	 * Elimina la extensión del fichero indicado en la ruta, basándose en el último
 	 * punto. Ejemplo: "C:/logs/app.v1.log" -> "C:/logs/app.v1"
+	 * 
+	 * @param pathStr
+	 * @return
 	 */
 	public static String removeExtension(String pathStr) {
 		if (pathStr == null) {
@@ -26,9 +30,13 @@ public class PathUtils {
 		return pathStr; // Return original if no extension found
 	}
 
+
 	/**
 	 * Remplaza la extensión de un fichero, proporcionando la ruta del fichero,
 	 * desde el último punto. Ejemplo: "logs/app.log" + ".bak" -> "logs/app.bak"
+	 * @param pathStr
+	 * @param newExtension
+	 * @return
 	 */
 	public static String replaceExtension(String pathStr, String newExtension) {
 		String pathWithoutExtension = removeExtension(pathStr);

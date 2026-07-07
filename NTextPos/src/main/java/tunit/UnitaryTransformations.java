@@ -90,7 +90,7 @@ public class UnitaryTransformations {
 			    }
 
 			    addRow = NTextPosUtils.rowContains(rowInput, textoBuscado,
-			            (Integer[]) this.optsTask.get("rowPositions"), modeFilterContains);
+			            (Integer[]) this.optsTask.get("colPositions"), modeFilterContains);
 			    if (addRow) {
 			        NTextPosUtils.copyRow(rowInput, writer, campoLongitudes);
 			    }
@@ -108,7 +108,7 @@ public class UnitaryTransformations {
 			    }
 
 			    addRow = !(NTextPosUtils.rowContains(rowInput, textoBorrar,
-			            (Integer[]) this.optsTask.get("rowPositions"), modeFilterContains));
+			            (Integer[]) this.optsTask.get("colPositions"), modeFilterContains));
 			    if (addRow) {
 			        NTextPosUtils.copyRow(rowInput, writer, campoLongitudes);
 			    }
@@ -256,8 +256,6 @@ public class UnitaryTransformations {
 	public Boolean doTask() {
 		Boolean result=false;
 		switch (uTask) {
-			case ObtenerRango:
-				break;
 			case CambiarPatron:
 			case EliminarBlancos:
 			case ObtenerFilasNMasX:
@@ -268,7 +266,6 @@ public class UnitaryTransformations {
 			case BorrarFilasPosiciones:
 			case ObtieneColumnasPosiciones:
 			case BorrarColumnasPosiciones:
-			case DividirColumnaPatron:			
 				result=this.getOutputFileCheckByRow();
 				break;
 			default:

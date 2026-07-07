@@ -23,6 +23,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -93,6 +94,8 @@ public class MainFrame extends JFrame {
 	private JTable pipelineTable;
 	private DefaultTableModel tableModel;
 	private DefaultListModel<TaskConfig> listModel;
+	
+	private JPanel jsonHeaderFieldsPanel;
 
 	/**
 	 * Tabla y colección persistente de instrucciones, donde muestra el grid con las
@@ -392,7 +395,7 @@ public class MainFrame extends JFrame {
 
 			// --> Creamos un panel contenedor para los campos del JSON actual con un diseño
 			// limpio
-			JPanel jsonHeaderFieldsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+			jsonHeaderFieldsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 			// Gestionamos las particularidades (cmdOptions) de algunos catálogos, que al
 			// ser comunes a todas las tareas posteriores
@@ -419,7 +422,7 @@ public class MainFrame extends JFrame {
 				/*txtDefFile = new JTextField(20);
 				jsonHeaderFieldsPanel.add(txtDefFile);*/
 
-				jsonHeaderFieldsPanel.add(FileSelectorManager.createFileSelectorComponent("txtDefFile"));
+				jsonHeaderFieldsPanel.add(FileSelectorManager.createFileSelectorComponent("txtDefFile","contSelP_txtDefFile"));
 
 				jsonHeaderFieldsPanel.add(new JLabel("Charset:"));
 				cmbCharset = CharsetCombo.createCharsetCombo();
@@ -486,7 +489,12 @@ public class MainFrame extends JFrame {
 			break;
 
 		case "config_text.json":
-			if (txtDefFile.getText().trim().isEmpty()) {
+			
+			//obtenemos el text que se encuentra dentro del panel
+
+			txtDefFile = FileSelectorManager.getJTextFilePathFromTopComponent(jsonHeaderFieldsPanel, "txtDefFile");
+			
+			if (txtDefFile==null || txtDefFile.getText().trim().isEmpty()) {
 				txtDefFile.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
 				txtDefFile.setToolTipText("Este campo es obligatorio.");
 				isValid = false;
@@ -515,7 +523,7 @@ public class MainFrame extends JFrame {
 			sb.append(" -c ").append(((String) cmbCharset.getSelectedItem()).trim());
 			break;
 		case "config_text.json":
-			sb.append(" -dc ").append(txtDelimiter.getText().trim());
+			sb.append(" -c ").append(((String) cmbCharset.getSelectedItem()).trim());
 			sb.append(" -d ").append(txtDefFile.getText().trim());
 			break;
 		}

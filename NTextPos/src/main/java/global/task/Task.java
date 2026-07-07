@@ -4,8 +4,7 @@ package global.task;
  * 
  * @version 1.0
  */
-public enum Task {CombinarHojas, 
-					ObtenerRango, 
+public enum Task {
 					EliminarBlancos,
 					CambiarPatron,
 					ObtenerFilasNMasX,
@@ -15,8 +14,7 @@ public enum Task {CombinarHojas,
 					ObtieneFilasPosiciones,
 					BorrarFilasPosiciones,
 					ObtieneColumnasPosiciones,
-					BorrarColumnasPosiciones,
-					DividirColumnaPatron,
-					UnirColumnasSecuencia
+					BorrarColumnasPosiciones
+
 					
 }

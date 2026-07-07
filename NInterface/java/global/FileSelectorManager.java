@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileFilter;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.io.File;
 /**
  * Clase par la gestión de un selector de ficheros
@@ -172,8 +173,28 @@ public class FileSelectorManager {
 	    }
 	    return "";
 	}
+	public static JTextField getJTextFilePathFromTopComponent(Component container, String name) {
+	    // 1. Si el componente actual es el JTextField que buscamos, lo devolvemos
+	    if (container instanceof JTextField && name.equals(container.getName())) {
+	        return (JTextField) container;
+	    }
 
-	public static JComponent createFileSelectorComponent(String txtName) {
+	    // 2. Si es un contenedor (JPanel, JComponent, etc.), buscamos dentro de sus hijos
+	    if (container instanceof Container) {
+	        Component[] components = ((Container) container).getComponents();
+	        for (Component comp : components) {
+	            // Llamada recursiva para bajar al siguiente nivel
+	            JTextField found = getJTextFilePathFromTopComponent(comp, name);
+	            if (found != null) {
+	                return found; // Si lo encontró en la profundidad
+	            }
+	        }
+	    }
+	    
+	    return null; // No se encontró en esta rama
+	}
+
+	public static JComponent createFileSelectorComponent(String txtName, String contentPanel) {
 	    JPanel panel = new JPanel(new BorderLayout(5, 0)); // 5 píxeles de separación horizontal
 	    JTextField txtOrigen = new JTextField(20);
 	    JButton btnBrowseOrigen = new JButton("...");
@@ -192,7 +213,7 @@ public class FileSelectorManager {
 	    
 	    panel.add(btnBrowseOrigen, BorderLayout.EAST);
 	   
-	    panel.setName("fileSelectorPanel"); 
+	    panel.setName(contentPanel); 
 	    
 	    return panel;
 	}
