@@ -68,7 +68,7 @@ public class UnitaryTransformations {
 		case ObtenerFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = CSVUtils.rowContainsListStr(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions"),modeFilterContains);
+					this.optsTask.get("colPositions"),modeFilterContains);
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
 			}
@@ -76,7 +76,7 @@ public class UnitaryTransformations {
 		case BorrarFilaColumnaContiene:
 			modeFilterContains=this.optsTask.get("mode")!=null?(Integer)this.optsTask.get("mode"):0;
 			addRow = !(CSVUtils.rowContainsListStr(rowInput, this.optsTask.get("rowText"),
-					this.optsTask.get("rowPositions"),modeFilterContains));
+					this.optsTask.get("colPositions"),modeFilterContains));
 			if (addRow) {
 				CSVUtils.copyRow(rowInput, this.opts.getOutputFile());
 			}
